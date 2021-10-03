@@ -39,7 +39,7 @@ path = Macro.getGlobal("path")
 
 # getting pagetime file names
 pagetime_files = [f for f in listdir(path) if isfile(join(path, f))]
-pagetime_files = [f for f in pagetime_files if "PageTimes" in f and "#" not in f] # omitting unnecessary files
+pagetime_files = [f for f in pagetime_files if "PageTimes" in f and ".csv" in f and "#" not in f] # omitting unnecessary files
 
 # calculating num files
 num_pagetime_files = len(pagetime_files)
@@ -119,4 +119,3 @@ use "$aux_path\iat_feedback_codes_1", clear
 use "$out_path\participant_codes", clear
 	merge 1:1 participant_code using "$out_path\iat_feedback_codes", nogen
 	replace seen_iat_feedback = 0 if missing(seen_iat_feedback)
-
