@@ -39,7 +39,9 @@ path = Macro.getGlobal("path")
 
 # getting pagetime file names
 pagetime_files = [f for f in listdir(path) if isfile(join(path, f))]
-pagetime_files = [f for f in pagetime_files if "PageTimes" in f] # omitting unnecessary files
+pagetime_files = [f for f in pagetime_files if "PageTimes" in f and "#" not in f] # omitting unnecessary files
+
+print(pagetime_files)
 
 # storing the file names as stata global
 Macro.setGlobal("pagetime_files", " ".join(pagetime_files))
@@ -92,6 +94,25 @@ foreach file of global pagetime_files{ // iterating accross pagetime_files
 		keep participant_code 
 		gen seen_iat_feedback = 1 // binary indicator for iat feedback
 		
+		duplicates drop //dropping  repeated obs
+		
 		save "$aux_path\iat_feedback_codes_`=counter'", replace
 		scalar counter = `=counter' + 1 // updating file counter
 }
+
+********
+**Creating a single file of unique codes from iat feedback participants
+********
+use "$aux_path\iat_feedback_codes_1", clear
+	append using "$aux_path\iat_feedback_codes_2"
+	duplicates report // verifying file consistency
+	
+	save "$out_path\iat_feedback_codes", replace
+
+********
+**Matching iat feedback data with participant_codes
+********	
+use "$out_path\participant_codes", clear
+	merge 1:1 participant_code using "$out_path\iat_feedback_codes", nogen
+	replace seen_iat_feedback = 0 if missing(seen_iat_feedback)
+
