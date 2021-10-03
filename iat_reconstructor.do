@@ -77,7 +77,7 @@ use "$aux_path\participant_ids_1", clear
 	
 	forvalues i=2/`=num_pagetime_files'{ // appending all id files
 		append using "$aux_path\participant_ids_`i'"
-		save "$out_path\participant_codes", replace		
+		save "$aux_path\participant_codes", replace		
 	}
 	
 
@@ -110,12 +110,13 @@ use "$aux_path\iat_feedback_codes_1", clear
 	
 	forvalues i=2/`=num_pagetime_files'{ // appending all iat id files
 		append using "$aux_path\iat_feedback_codes_`i'"	
-		save "$out_path\iat_feedback_codes", replace
+		save "$aux_path\iat_feedback_codes", replace
 	}
 
 ********
 **Matching iat feedback data with participant_codes
 ********	
-use "$out_path\participant_codes", clear
-	merge 1:1 participant_code using "$out_path\iat_feedback_codes", nogen
+use "$aux_path\participant_codes", clear
+	merge 1:1 participant_code using "$aux_path\iat_feedback_codes", nogen
 	replace seen_iat_feedback = 0 if missing(seen_iat_feedback)
+	save "$out_path\participants_iat_feedback", replace

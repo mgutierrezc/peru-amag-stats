@@ -19,10 +19,9 @@ In order to run it, follow this steps:
 - Change the path from the `iat_reconstructor ` do file to the repo root folder `path\peru-amag-stats`
 - Run the do file
 
-The output will be stored in the folder `path\peru-amag-stats\output`, which will be created when running the do. This do file outputs two databases as dta:
+The output will be stored in the folder `path\peru-amag-stats\output`, which will be created when running the do. This do file outputs one db as `.dta`:
 
-- `participant_codes`, which contains a list with each individual oTree participant code
-- `iat_feedback_codes`, which contains two variables: the individual oTree participant code and a binary indicator of whether the participant has seen its iat feedback (1 if he has seen it, 0 if not)
+- `participants_iat_feedback`, which contains two variables: the individual oTree participant code and a binary indicator of whether the participant has seen its iat feedback (1 if he has seen it, 0 if not)
 
 
 
