@@ -9,7 +9,7 @@ This do file obtains whether a player from the Peru-Amag sessions has seen it's 
 
 Requirements:
 
-- Python 3.x
+- Python 3.x. You can download it [here](https://www.python.org/downloads/)
 
 
 
