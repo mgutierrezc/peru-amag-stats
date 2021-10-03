@@ -63,7 +63,7 @@ foreach file of global pagetime_files{ // iterating accross pagetime_files
 		duplicates drop
 		
 		save "$aux_path\participant_ids_`=counter'", replace
-		scalar counter = `=counter' + 1
+		scalar counter = `=counter' + 1 // updating file counter
 }
 
 ********
@@ -75,3 +75,23 @@ use "$aux_path\participant_ids_1", clear
 	
 	save "$out_path\participant_codes", replace
 	
+
+/*----------------------
+Generating binary IAT Feedback indicator
+-----------------------*/
+
+********
+**Checking players who have seen the IAT Feedback page (ResultI)
+********
+scalar counter = 1 // file counter
+foreach file of global pagetime_files{ // iterating accross pagetime_files
+	import delimited `file', clear
+		
+		*keeping the codes of participants who played the IAT
+		keep if page_name == "ResultI"
+		keep participant_code 
+		gen seen_iat_feedback = 1 // binary indicator for iat feedback
+		
+		save "$aux_path\iat_feedback_codes_`=counter'", replace
+		scalar counter = `=counter' + 1 // updating file counter
+}
