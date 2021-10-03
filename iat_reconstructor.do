@@ -41,11 +41,11 @@ path = Macro.getGlobal("path")
 pagetime_files = [f for f in listdir(path) if isfile(join(path, f))]
 pagetime_files = [f for f in pagetime_files if "PageTimes" in f and "#" not in f] # omitting unnecessary files
 
-print(pagetime_files)
+# calculating num files
+num_pagetime_files = len(pagetime_files)
 
 # storing the file names as stata global
 Macro.setGlobal("pagetime_files", " ".join(pagetime_files))
-
 end
 
 
@@ -68,14 +68,17 @@ foreach file of global pagetime_files{ // iterating accross pagetime_files
 		scalar counter = `=counter' + 1 // updating file counter
 }
 
+scalar num_pagetime_files = `=counter' - 1 // total number of pagetime_files
+
 ********
 **Creating a single file of unique codes
 ********
 use "$aux_path\participant_ids_1", clear
-	append using "$aux_path\participant_ids_2"
-	duplicates report // verifying file consistency
 	
-	save "$out_path\participant_codes", replace
+	forvalues i=2/`=num_pagetime_files'{ // appending all id files
+		append using "$aux_path\participant_ids_`i'"
+		save "$out_path\participant_codes", replace		
+	}
 	
 
 /*----------------------
@@ -94,7 +97,7 @@ foreach file of global pagetime_files{ // iterating accross pagetime_files
 		keep participant_code 
 		gen seen_iat_feedback = 1 // binary indicator for iat feedback
 		
-		duplicates drop //dropping  repeated obs
+		duplicates drop //dropping repeated obs
 		
 		save "$aux_path\iat_feedback_codes_`=counter'", replace
 		scalar counter = `=counter' + 1 // updating file counter
@@ -104,10 +107,11 @@ foreach file of global pagetime_files{ // iterating accross pagetime_files
 **Creating a single file of unique codes from iat feedback participants
 ********
 use "$aux_path\iat_feedback_codes_1", clear
-	append using "$aux_path\iat_feedback_codes_2"
-	duplicates report // verifying file consistency
 	
-	save "$out_path\iat_feedback_codes", replace
+	forvalues i=2/`=num_pagetime_files'{ // appending all iat id files
+		append using "$aux_path\iat_feedback_codes_`i'"	
+		save "$out_path\iat_feedback_codes", replace
+	}
 
 ********
 **Matching iat feedback data with participant_codes
