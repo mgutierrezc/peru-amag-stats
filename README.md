@@ -15,13 +15,27 @@ Requirements:
 
 In order to run it, follow this steps:
 
-- Place the all the pagetimes raw data within the repo root folder `path\peru-amag-stats`
+- Place the all the pagetimes and behavioral raw data within the repo root folder `path\peru-amag-stats`
 - Change the path from the `iat_reconstructor ` do file to the repo root folder `path\peru-amag-stats`
 - Run the do file
 
 The output will be stored in the folder `path\peru-amag-stats\output`, which will be created when running the do. This do file outputs one db as `.dta`:
 
-- `participants_iat_feedback`, which contains two variables: the individual oTree participant code and a binary indicator of whether the participant has seen its iat feedback (1 if he has seen it, 0 if not)
+- `players_iat_feedback`, which follows this structure:
+
+
+
+| participant_code | DNI  | session_code | seen_iat_feedback | consistency_identifier |
+| ---------------- | ---- | ------------ | ----------------- | ---------------------- |
+|                  |      |              |                   |                        |
+
+
+
+- `participant_code`: oTree participant identifier
+- `DNI`: experimenter defined participant identifier
+- `session_code`: oTree session identifier
+- `seen_iat_feedback`: binary indicator of whether the participant has seen its iat feedback (1 if he has seen it, 0 if not)
+- `consistency_identifier`: checks whether the data is consistent (observation in behavioral and pagetimes db) or not
 
 
 
