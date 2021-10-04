@@ -174,25 +174,10 @@ use "$aux_path\participant_dnis", clear
 	label define consistency_labels 1 "Only on behavioral data" 2 "Only on pagetime data" 3 "Consistent" 
 	label values consistency_identifier consistency_labels 
 
+	save "$out_path\players_iat_feedback", replace
+	
 ********
 **Deleting aux data
 ********
 
-// !rmdir "$aux_path" /s /q
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+!rmdir "$aux_path" /s /q
