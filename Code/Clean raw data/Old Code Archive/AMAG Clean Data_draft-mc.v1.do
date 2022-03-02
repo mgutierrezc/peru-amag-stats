@@ -1,0 +1,40 @@
+*AMAG data cleaning code
+
+*Drop observations without DNI
+drop if login1playerdni==.
+
+*Drop demo observations
+drop if sessionis_demo==1
+drop sessionis_demo
+
+*Drop bot observations
+drop if participant_is_bot==1
+drop participant_is_bot
+
+*Drop blank/unnecessary variables
+drop survey_qvsr1playerat_this_time_1 survey_qvsr1playerat_this_time_2 survey_qvsr1playerat_this_time_3 survey_qvsr1playerat_this_time_4 survey_qvsr1playerat_this_time_5 survey_qvsr1playerat_this_time_6 survey_qvsr1playerat_this_time_7 survey_qvsr1playerthink_of_you_1 survey_qvsr1playerthink_of_you_2 survey_qvsr1playerthink_of_day_1 survey_qvsr1playerthink_of_day_2 survey_qvsr1playerthink_of_day_3
+
+drop v64 v65 v66 v68 // not sure how to handle these variables since they might be named differently for others when CSV is exported to stata
+
+drop survey_qvsr1playerwork_engagemen v54 v55 
+
+drop login1playerpayoff login1playerrole
+
+drop participantvisited participantmturk_worker_id participantmturk_assignment_id 
+
+drop sessionlabel sessionmturk_hitgroupid sessionmturk_hitid sessioncomment
+
+drop sessionconfigparticipation_fee sessionconfigmock_exogenous_data sessionconfigreal_world_currency login1groupid_in_subsession login1subsessionround_number survey_qvsr1playerpayoff redistribute1playerpayoff participanttime_started  redistribute1subsessionround_num redistribute1groupid_in_subsessi trolley1playerpayoff iat1playerpayoff socratic_video1playerpayoff motivated_reasoning1playerpayoff prize1playerpayoff prize1subsessionround_number prize1groupid_in_subsession //not sure if these variables should be dropped
+
+drop survey_qvsr1playerrole  survey_qvsr1playerlg_selected survey_qvsr1playerip survey_qvsr1playerregion_detecte redistribute1playerrole games_solo1playerrole v132 v133 trolley1playerrole iat1playerrole socratic_video1playerrole motivated_reasoning1playerrole prize1playerrole
+
+*Rename variables- not sure how this code should be handled since the stata might put different variable names for these 
+rename v79 redistribute_partnername_a
+rename v130 motivatedreason_approveconfiden
+rename v138 motivatedreason_timestamp
+rename v78 redistribute_partnerDNI_b
+rename v80 redistribute_partnername_b
+rename v81 redistribute_player_decision
+rename v88 games_solo_partner_name
+rename v92 games_player_knowredist_partnB
+

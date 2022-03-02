@@ -128,6 +128,17 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# WB folders
+Analysis/
+Data/
+IRB submissions/
+Links (google drive and staging)/
+
+# Images and Docs
+*.docx
+*.png
+*.jpeg
+
 # Datasets
 *.csv
 *.csv#
