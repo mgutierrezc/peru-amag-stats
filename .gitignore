@@ -135,9 +135,11 @@ IRB submissions/
 Links (google drive and staging)/
 
 # Images and Docs
+*.gph
 *.docx
 *.png
 *.jpeg
+*.txt
 
 # Datasets
 *.csv
