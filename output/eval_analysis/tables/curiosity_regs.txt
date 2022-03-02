@@ -1,0 +1,35 @@
+		(1)	(2)	(3)
+VARIABLES	LABELS	motivated_reasoning.1.player.want_to_learn	motivated_reasoning.1.player.want_to_learn	motivated_reasoning.1.player.want_to_learn
+				
+en_motivated_info	motivated_reasoning.1.player.want_to_learn			
+				
+2.en_Curso	Curso = 2, Constitutional_Interpretation	0.0368***	0.0447***	0.208***
+		(0)	(0.00118)	(0.00168)
+3.en_Curso	Curso = 3, Jurisprudence	0.00175***	-0.00172	0.0701***
+		(0)	(0.293)	(1.21e-05)
+4.en_Curso	Curso = 4, Reasoning	-0.00945***	0.0126	0.119***
+		(0)	(0.219)	(0.00111)
+5.en_Curso	Curso = 5, Virtues_Principles	-0.0142***	-0.00794*	0.0951***
+		(0)	(0.0545)	(2.14e-06)
+6.en_Curso	Curso = 6, Ethics	0.0664***	0.0887***	0.191***
+		(0)	(0.000212)	(0.000319)
+Age_rounded	Age_rounded		0.00531***	0.00866**
+			(0.00189)	(0.0346)
+2.en_Gender	Género = 2, Male		-0.0481	-0.116**
+			(0.112)	(0.0475)
+2.en_Cargo	Cargo = 2, Auxiliary		-0.0859	-0.0730
+			(0.277)	(0.513)
+3.en_Cargo	Cargo = 3, Prosecutor		-0.0294	0.0320
+			(0.362)	(0.647)
+4.en_Cargo	Cargo = 4, Judge		-0.117**	-0.0747
+			(0.0297)	(0.486)
+bs_motivated_reasoner	bs_motivated_reasoner			-0.0552
+				(0.225)
+Constant	Constant	0.897***	0.759***	0.565**
+		(0)	(6.12e-06)	(0.0116)
+				
+Observations		300	300	150
+R-squared		0.007	0.045	0.114
+mean		.907	.907	.907
+Robust pval in parentheses				
+*** p<0.01, ** p<0.05, * p<0.1				

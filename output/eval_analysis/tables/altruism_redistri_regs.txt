@@ -1,0 +1,39 @@
+		(1)	(2)	(3)	(4)	(5)	(6)	(7)	(8)
+VARIABLES	LABELS	games_solo.1.player.dictator_decision	games_solo.1.player.dictator_decision	dictator_decision_change	dictator_decision_change	redistribute.1.player.redistribute_decision	redistribute.1.player.redistribute_decision	redistribute_decision_change	redistribute_decision_change
+									
+en_dictator_decision	games_solo.1.player.dictator_decision								
+									
+2.en_Curso	Curso = 2, Constitutional_Interpretation	-0.332***	-0.281***	-0.190***	-0.188	0.306***	0.259***	-0.174***	-0.0509
+		(0)	(0.00248)	(0)	(0.303)	(0)	(0.00184)	(0)	(0.715)
+3.en_Curso	Curso = 3, Jurisprudence	-0.0362***	0.0549	0.323***	0.359***	0.100***	0.115**	-0.434***	-0.509***
+		(0)	(0.239)	(0)	(0.000598)	(0)	(0.0463)	(0)	(0.000643)
+4.en_Curso	Curso = 4, Reasoning	-0.303***	-0.379***	-0.0758***	-0.122*	0.208***	0.140	0.225***	0.323**
+		(0)	(0.000365)	(0)	(0.0949)	(0)	(0.125)	(0)	(0.0224)
+5.en_Curso	Curso = 5, Virtues_Principles	-0.238***	-0.238***	0.986***	0.915***	0.166***	0.171***	0.315***	0.312***
+		(0)	(2.36e-05)	(0)	(6.02e-06)	(0)	(2.23e-05)	(0)	(0.00472)
+6.en_Curso	Curso = 6, Ethics	-0.0866***	-0.118***	0.980***	0.813***	0.155***	0.0870	0.919***	1.017***
+		(0)	(0.00818)	(0)	(5.56e-05)	(0)	(0.106)	(0)	(0.000288)
+Age_rounded	Age_rounded		-0.0192**		-0.0257		-0.0261		0.0248
+			(0.0369)		(0.198)		(0.204)		(0.208)
+2.en_Gender	Género = 2, Male		0.589*		0.221		-0.0160		-0.218
+			(0.0703)		(0.412)		(0.949)		(0.552)
+2.en_Cargo	Cargo = 2, Auxiliary		0.0481		0.446		0.216		0.251
+			(0.905)		(0.508)		(0.215)		(0.627)
+3.en_Cargo	Cargo = 3, Prosecutor		-0.0141		0.107		0.312		0.0618
+			(0.910)		(0.851)		(0.163)		(0.870)
+4.en_Cargo	Cargo = 4, Judge		0.372		0.758		0.139		0.307
+			(0.236)		(0.167)		(0.610)		(0.685)
+dictator_decision_change	dictator_decision_change								
+									
+en_redistribute_decision	redistribute.1.player.redistribute_decision								
+									
+redistribute_decision_change	redistribute_decision_change								
+									
+Constant	Constant	4.571***	4.889***	-0.0909***	0.504	4.054***	4.933***	0.231***	-0.787
+		(0)	(5.34e-05)	(0)	(0.570)	(0)	(0.000526)	(0)	(0.331)
+									
+Observations		354	354	193	193	448	448	232	232
+R-squared		0.005	0.036	0.038	0.061	0.003	0.020	0.031	0.049
+mean		4.404	4.404	.119	.119	4.205	4.205	.259	.259
+Robust pval in parentheses									
+*** p<0.01, ** p<0.05, * p<0.1									
