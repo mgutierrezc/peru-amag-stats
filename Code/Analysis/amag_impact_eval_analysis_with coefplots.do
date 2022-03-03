@@ -1,60 +1,71 @@
 clear all 
-use "C:\Users\ronhi\Dropbox (Harvard University)\My PC (DESKTOP-CVKB4OL)\Desktop\DIME\Data Analysis\Clean_Full_Data.dta"  
 
-cd "C:\Users\ronhi\Dropbox (Harvard University)\My PC (DESKTOP-CVKB4OL)\Desktop\DIME\Data Analysis\"
+global main "D:\Accesos directos\Trabajo\World Bank\Peru Amag\peru-amag-stats"
+global data "$main\Data"
+global output "$main\output"
+
+global eval_analysis "$output\eval_analysis"
+cap mkdir "$eval_analysis"
+global tables "$eval_analysis\tables"
+cap mkdir "$tables"
+global graphs "$eval_analysis\graphs"
+cap mkdir "$graphs"
+
+use "$data\Clean_Full_Data.dta"  
+
 *****************************************************
 *Defining controls for all regressions - later in subsections other controls are added
 *****************************************************
-ren Cargo Position
-lab var Position Position
-ren Curso Course
-lab var Course Course
-ren Género Gender
-lab var Gender Gender
+	ren Cargo Position
+	lab var Position Position
+	ren Curso Course
+	lab var Course Course
+	ren Género Gender
+	lab var Gender Gender
 
-encode Position, gen(en_Position)
-encode Course, gen(en_Course)
-encode Gender, gen(en_Gender)
-//shortening names
-ren bs_dictator_partner_gender bs_dictator_pgender
-ren en_dictator_partner_gender en_dictator_pgender
-ren bs_redistribute_partner_gender_a bs_redistribute_pgendera
-ren bs_redistribute_partner_gender_b bs_redistribute_pgenderb
-ren en_redistribute_partner_gender_a en_redistribute_pgendera
-ren en_redistribute_partner_gender_b en_redistribute_pgenderb
+	encode Position, gen(en_Position)
+	encode Course, gen(en_Course)
+	encode Gender, gen(en_Gender)
+	//shortening names
+	ren bs_dictator_partner_gender bs_dictator_pgender
+	ren en_dictator_partner_gender en_dictator_pgender
+	ren bs_redistribute_partner_gender_a bs_redistribute_pgendera
+	ren bs_redistribute_partner_gender_b bs_redistribute_pgenderb
+	ren en_redistribute_partner_gender_a en_redistribute_pgendera
+	ren en_redistribute_partner_gender_b en_redistribute_pgenderb
 
-lab def position 1 Assistant 2 Auxiliary 3 Prosecutor 4 Judge
-lab val en_Position position
-lab def courses 1 Convention_Constitution 2 Constitutional_Interpretation 3 Jurisprudence 4 Reasoning 5 Virtues_Principles 6 Ethics
-lab val en_Course courses 
-lab def gender 1 Female 2 Male
-lab val en_Gender gender
-foreach x in  bs_dictator_pgender en_dictator_pgender bs_redistribute_pgendera en_redistribute_pgendera en_redistribute_pgenderb {
-	encode `x', gen(`x'_num)
-	lab val `x'_num gender
-}
+	lab def position 1 Assistant 2 Auxiliary 3 Prosecutor 4 Judge
+	lab val en_Position position
+	lab def courses 1 Convention_Constitution 2 Constitutional_Interpretation 3 Jurisprudence 4 Reasoning 5 Virtues_Principles 6 Ethics
+	lab val en_Course courses 
+	lab def gender 1 Female 2 Male
+	lab val en_Gender gender
+	foreach x in  bs_dictator_pgender en_dictator_pgender bs_redistribute_pgendera en_redistribute_pgendera en_redistribute_pgenderb {
+		encode `x', gen(`x'_num)
+		lab val `x'_num gender
+	}
 
-tab Position, gen(position_)
-tab Course, gen(course_)
-tab Gender, gen(gender_)
+	tab Position, gen(position_)
+	tab Course, gen(course_)
+	tab Gender, gen(gender_)
 
-lab var course_1 Convention_Constitution
-lab var course_2 Constitional_Interpretation
-lab var course_3 Jurisprudence
-lab var course_4 Reasoning
-lab var course_5 Virtues_Principles
-lab var course_6 Ethics
+	lab var course_1 Convention_Constitution
+	lab var course_2 Constitional_Interpretation
+	lab var course_3 Jurisprudence
+	lab var course_4 Reasoning
+	lab var course_5 Virtues_Principles
+	lab var course_6 Ethics
 
-lab var position_1 Assistant
-lab var position_2 Auxiliary
-lab var position_3 Prosecutor
-lab var position_4 Judge
+	lab var position_1 Assistant
+	lab var position_2 Auxiliary
+	lab var position_3 Prosecutor
+	lab var position_4 Judge
 
-lab var gender_1 Female
-lab var gender_2 Male
+	lab var gender_1 Female
+	lab var gender_2 Male
 
-//global controls1 i.en_Curso 
-global controls2 i.en_Course Age_rounded i.en_Gender i.en_Position
+	//global controls1 i.en_Curso 
+	global controls2 i.en_Course Age_rounded i.en_Gender i.en_Position
 
 *****************************************************
 **IMPACT EVALUATION OF COURSES 
