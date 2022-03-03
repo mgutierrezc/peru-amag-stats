@@ -1,4 +1,18 @@
+cls
+/***********
+**Impact Analysis of Peru Amag project
+with Socratic Analysis
+
+Project: Peru-Amag
+Programmer: Ronak Jain/Mayumi Cornejo
+Editor: Marco Gutierrez
+***********/
+
 clear all 
+
+/*--------------
+Defining paths
+--------------*/
 
 global main "D:\Accesos directos\Trabajo\World Bank\Peru Amag\peru-amag-stats"
 global data "$main\Data"
