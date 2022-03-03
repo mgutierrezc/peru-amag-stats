@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 # WB folders
-Analysis/
+Analysis Output/
 Data/
 IRB submissions/
 Links (google drive and staging)/
