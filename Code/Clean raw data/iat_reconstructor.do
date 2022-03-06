@@ -1,3 +1,4 @@
+cls
 /***********
 **Reconstructing if player saw 
 IAT Feedback
@@ -10,20 +11,21 @@ Programmer: Marco Gutierrez
 /*----------------------
 Initiating script configuration
 -----------------------*/
-cls
 clear all
 set more off
 
 **setting up paths
-global path "D:\Accesos directos\Trabajo\World Bank\Repos\peru-amag-stats"
+global main "D:\Accesos directos\Trabajo\World Bank\Peru Amag\peru-amag-stats"
+global data "$main\Data"
+global baseline "$data\Baseline raw\Last baseline data download"
 
-global aux_path "$path\aux_output" // for auxiliary files
-cap mkdir "$aux_path"
-
-global out_path "$path\output"
+global out_path "$main\output"
 cap mkdir "$out_path"
 
-cd "$path" // defining main dir
+global aux_path "$out_path\aux_output" // for auxiliary files
+cap mkdir "$aux_path"
+
+cd "$baseline" // defining main dir
 
 
 /*----------------------
@@ -35,7 +37,7 @@ from os import listdir
 from os.path import isfile, join
 
 # setting up paths
-path = Macro.getGlobal("path")
+path = Macro.getGlobal("baseline")
 
 # getting pagetime file names
 pagetime_files = [f for f in listdir(path) if isfile(join(path, f))]
@@ -61,6 +63,8 @@ Finding all participant codes/DNIs
 scalar counter = 1 // file counter
 foreach file of global pagetime_files{ // iterating accross pagetime_files
 	import delimited `file', clear
+		
+		codebook participant_code
 		
 		* keeping only participant codes
 		keep participant_code session_code
@@ -106,7 +110,10 @@ use "$aux_path\participant_ids_1", clear
 		append using "$aux_path\participant_ids_`i'"
 		save "$aux_path\participant_codes", replace		
 	}
+	
+	save "$aux_path\participant_codes", replace
 
+	
 ********
 **Creating a single file of unique codes
 ********
@@ -116,7 +123,9 @@ use "$aux_path\participant_dnis_1", clear
 		append using "$aux_path\participant_dnis_`i'"
 		save "$aux_path\participant_dnis", replace		
 	}
-
+	
+	duplicates drop
+	save "$aux_path\participant_dnis", replace
 
 /*----------------------
 Generating binary IAT Feedback indicator
@@ -149,7 +158,10 @@ use "$aux_path\iat_feedback_codes_1", clear
 		append using "$aux_path\iat_feedback_codes_`i'"	
 		save "$aux_path\iat_feedback_codes", replace
 	}
+	
+	save "$aux_path\iat_feedback_codes", replace
 
+	
 ********
 **Matching iat feedback data with participant_codes
 ********	
@@ -158,22 +170,30 @@ use "$aux_path\participant_codes", clear
 	replace seen_iat_feedback = 0 if missing(seen_iat_feedback)
 	save "$aux_path\participants_iat_feedback", replace
 	
+	
 ********
 **Matching iat feedback data with participant_dnis
 ********
 use "$aux_path\participant_dnis", clear
+	
 	merge 1:1 participant_code using "$aux_path\participants_iat_feedback", gen(consistency_identifier)
 	sort consistency_identifier
 	
-	* recovering missing session codes from pagetime data
+	*recovering missing session codes from pagetime data
 	replace sessioncode = session_code_pagetime if sessioncode==""
 	drop session_code_pagetime
 	rename sessioncode session_code
 	
-	* labeling data according to consistency
+	*labeling data according to consistency
 	label define consistency_labels 1 "Only on behavioral data" 2 "Only on pagetime data" 3 "Consistent" 
 	label values consistency_identifier consistency_labels 
 
+	keep if consistency_identifier == 3
+	drop consistency_identifier
+	
+	*droping duplicates based on DNI (only 1 obs in baseline with same value for seen iat)
+	duplicates drop DNI, force
+	
 	save "$out_path\players_iat_feedback", replace
 	
 ********
