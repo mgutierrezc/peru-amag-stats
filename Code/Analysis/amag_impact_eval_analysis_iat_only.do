@@ -27,13 +27,17 @@ cap mkdir "$graphs"
 
 use "$data\Clean_Full_Data.dta"  
 
-*****************************************************
-*Defining controls for all regressions - later in subsections other controls are added
-*****************************************************
+/*----------------------------------------------
+Defining controls for all regressions - later in 
+subsections other controls are added
+-----------------------------------------------*/
+
+	*encoding main vars of interest
 	encode Cargo, gen(en_Cargo)
 	encode Curso, gen(en_Curso)
 	encode Género, gen(en_Gender)
 
+	*defining value labels
 	lab def position 1 Assistant 2 Auxiliary 3 Prosecutor 4 Judge
 	lab val en_Cargo position
 	lab def courses 1 Convention_Constitution 2 Constitutional_Interpretation 3 Jurisprudence 4 Reasoning 5 Virtues_Principles 6 Ethics
@@ -41,10 +45,12 @@ use "$data\Clean_Full_Data.dta"
 	lab def gender 1 Female 2 Male
 	lab val en_Gender gender
 
+	*generating dummies per categories
 	tab Cargo, gen(cargo_)
 	tab Curso, gen(curso_)
 	tab Género, gen(gender_)
 
+	*labeling course variables
 	lab var curso_1 Convention_Constitution
 	lab var curso_2 Constitional_Interpretation
 	lab var curso_3 Jurisprudence
@@ -52,11 +58,13 @@ use "$data\Clean_Full_Data.dta"
 	lab var curso_5 Virtues_Principles
 	lab var curso_6 Ethics
 
+	*labeling current possitions
 	lab var cargo_1 Assistant
 	lab var cargo_2 Auxiliary
 	lab var cargo_3 Prosecutor
 	lab var cargo_4 Judge
 
+	*labeling gender
 	lab var gender_1 Female
 	lab var gender_2 Male
 
@@ -65,9 +73,10 @@ use "$data\Clean_Full_Data.dta"
 	global controls2 i.en_Curso Age_rounded i.en_Gender i.en_Cargo
 
 
-*****************************************************
-*Attrition and selection on observables
-*****************************************************
+/*------------------------------------
+Attrition and selection on observables
+--------------------------------------*/
+
 	*Attrition for those who completed at baseline but not endline
 	gen attrition=.
 	replace attrition = 0 if bs_Estado_de_Cuestionario=="Completo"
@@ -79,15 +88,16 @@ use "$data\Clean_Full_Data.dta"
 	reg attrition $controls2 ,  cluster(Curso) 
 	outreg2 using "$tables\attrition.xls", replace stats(coef pval ) level(95) addtext(mean, `mean') label
 
-	*Selection on obaservables 
+	*Selection on observables 
 	orth_out cargo_* curso_* gender_1 Age_rounded using "$tables\selection.xlsx", by(en_Estado_de_Cuestionario) pcompare stars se sheet(selection_en) sheetreplace
 	orth_out cargo_* curso_* gender_1 Age_rounded using "$tables\selection.xlsx", by(bs_Estado_de_Cuestionario) pcompare stars se sheet(selection_bs) sheetreplace
 
 
-*****************************************************
-*Motivated Reasoning
-*****************************************************
-//Note: The way the question was asked the values capture the chance it was true news
+/*---------------------------
+Motivated Reasoning Variables
+-----------------------------*/
+
+	//Note: The way the question was asked the values capture the chance it was true news
 	foreach x in bs en {
 		*motivated reasoner dummy
 		tab `x'_motivated_fakenews if `x'_participant_merge==3, m 
@@ -104,49 +114,6 @@ use "$data\Clean_Full_Data.dta"
 	global controls3 i.en_Curso Age_rounded i.en_Gender i.en_Cargo bs_motivated_reasoner 
 	global controls4 i.en_Curso Age_rounded i.en_Gender i.en_Cargo en_motivated_newsh bs_motivated_reasoner ///direction of motivated reasoning on average 
 
-	local i = 1
-	foreach y in en_motivated_reasoner en_motivated_intensity {
-		qui sum `y', d
-		local mean = round(`r(mean)', 0.001) 
-	reg `y' $controls1 ,  cluster(Curso) 
-
-		if(`i'==1){
-	outreg2 using "$tables\motivated_reasoning_regs.xls", replace stats(coef pval ) level(95) addtext(mean, `mean') label
-		} 
-		else{
-			outreg2 using "$tables\motivated_reasoning_regs.xls", append stats(coef pval ) level(95) addtext(mean, `mean') label
-				}
-
-				local i = `i' + 1
-				
-	reg `y' $controls2 ,  cluster(Curso) 
-
-		if(`i'==1){
-	outreg2 using "$tables\motivated_reasoning_regs.xls", replace stats(coef pval ) level(95) addtext(mean, `mean') label
-		} 
-		else{
-			outreg2 using "$tables\motivated_reasoning_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-				}
-				
-	reg `y' $controls3 ,  cluster(Curso) 
-
-		if(`i'==1){
-	outreg2 using "$tables\motivated_reasoning_regs.xls", replace stats(coef pval ) level(95)  addtext(mean, `mean') label
-		} 
-		else{
-			outreg2 using "$tables\motivated_reasoning_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-				}
-				
-	reg `y' $controls4 ,  cluster(Curso) 
-
-		if(`i'==1){
-	outreg2 using "$tables\motivated_reasoning_regs.xls", replace stats(coef pval ) level(95)  addtext(mean, `mean') label
-		} 
-		else{
-			outreg2 using "$tables\motivated_reasoning_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-				}
-	}
-
 	*confirmation bias 
 	*-> whether clicked on both briefs (and order if can extract time stamps)
 	//Note: currently also counting those who did not click ay brief as exhibiting confirmation bias
@@ -159,41 +126,20 @@ use "$data\Clean_Full_Data.dta"
 	**Third set of controls
 	global controls5 i.en_Curso Age_rounded i.en_Gender i.en_Cargo bs_conf_bias 
 
-	foreach y in en_conf_bias {
-		qui sum `y', d
-		local mean = round(`r(mean)', 0.001) 
-	reg `y' $controls1 ,  cluster(Curso) 
-	outreg2 using "$tables\conf_bias_regs.xls", replace stats(coef pval ) level(95) addtext(mean, `mean') label
-				
-	reg `y' $controls2 ,  cluster(Curso) 
-	outreg2 using "$tables\conf_bias_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-				
-	reg `y' $controls5 ,  cluster(Curso) 
-	outreg2 using "$tables\conf_bias_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-	}
-
 	*Curiosity
 	**Third set of controls (redefined)
 	global controls5 i.en_Curso Age_rounded i.en_Gender i.en_Cargo bs_motivated_info
 
-	foreach y in en_motivated_info {
-		qui sum `y', d
-		local mean = round(`r(mean)', 0.001) 
-	reg `y' $controls1 ,  cluster(Curso) 
-	outreg2 using "$tables\curiosity_regs.xls", replace stats(coef pval ) level(95) addtext(mean, `mean') label
-				
-	reg `y' $controls2 ,  cluster(Curso) 
-	outreg2 using "$tables\curiosity_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-				
-	reg `y' $controls3 ,  cluster(Curso) 
-	outreg2 using "$tables\curiosity_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-	}
+	
+/*---------------------------
+IAT take up of exercise and feedback
+---
+*Analyze selection on observables for those who 
+choose to take the test 
+*Analyze selection on observables for receiving 
+feedback or not 
+-----------------------------*/
 
-**********************************************************************************************************
-***IAT take up of exercise and feedback
-*Analyze selection on observables for those who choose to take the test 
-*Analyze selection on observables for receiving feedback or not 
-**********************************************************************************************************
 	*Selection on observables for takeup
 	orth_out cargo_* curso_* gender_1 Age_rounded using "$tables\iat_selection.xlsx" if iat_option_take_or_not==1, by(en_iat_player_skipped) pcompare stars se sheet(selection_iat_takeup) sheetreplace
 
@@ -203,11 +149,15 @@ use "$data\Clean_Full_Data.dta"
 
 	orth_out cargo_* curso_* gender_1 Age_rounded using "$tables\iat_selection.xlsx" if iat_feedback_option_or_not==1, by(en_ignore_feedback) pcompare stars se sheet(selection_iat_feedback) sheetreplace
 
-	*****************************************************
-	*IAT scores
-	*****************************************************
+	
+	/*--------
+	IAT scores
+	----------*/
+
 	gen iat_score_change = en_iat_score-bs_iat_score
 
+	*TODO: reconstruct iat var for baseline only (use latest downloaded data)
+	
 	*creating a dummy for whether they saw their feedback at baseline
 	gen bs_saw_iat_feedback=0 if bs_iat_score!=.
 	replace bs_saw_iat_feedback=1 if bs_iat_feedback_descriptive!="" & regex(bs_iat_feedback_descriptive, "No fue")==0
@@ -252,7 +202,7 @@ use "$data\Clean_Full_Data.dta"
 		outreg2 using "$tables\iat_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
 	}
 
-	***Looking at IAT results of only those who were forced to take the IAT - no selection issues at all
+	**Looking at IAT results of only those who were forced to take the IAT - no selection issues at all
 	local i = 1
 	foreach y in en_iat_score iat_score_change en_iat_want_feedback en_iat_feedback_level {
 		qui sum `y', d
