@@ -73,9 +73,9 @@ subsections other controls are added
 	global controls2 i.en_Curso Age_rounded i.en_Gender i.en_Cargo
 
 
-/*------------------------------------
-Attrition and selection on observables
---------------------------------------*/
+/*-------
+Attrition
+---------*/
 
 	*Attrition for those who completed at baseline but not endline
 	gen attrition=.
@@ -83,16 +83,7 @@ Attrition and selection on observables
 	replace attrition = 1 if (regex(en_Estado_de_Cuestionario,"Comenzo") | regex(en_Estado_de_Cuestionario,"Falta")) & bs_Estado_de_Cuestionario=="Completo"
 	tab attrition
 
-	qui sum attrition, d
-	local mean = round(`r(mean)', 0.001) 
-	reg attrition $controls2 ,  cluster(Curso) 
-	outreg2 using "$tables\attrition.xls", replace stats(coef pval ) level(95) addtext(mean, `mean') label
-
-	*Selection on observables 
-	orth_out cargo_* curso_* gender_1 Age_rounded using "$tables\selection.xlsx", by(en_Estado_de_Cuestionario) pcompare stars se sheet(selection_en) sheetreplace
-	orth_out cargo_* curso_* gender_1 Age_rounded using "$tables\selection.xlsx", by(bs_Estado_de_Cuestionario) pcompare stars se sheet(selection_bs) sheetreplace
-
-
+	
 /*---------------------------
 Motivated Reasoning Variables
 -----------------------------*/
@@ -171,9 +162,26 @@ feedback or not
 	global controls7 i.en_Curso Age_rounded i.en_Gender i.en_Cargo iat_option_take_or_not  //iat_feedback_option_or_not
 
 	**Fourth set of controls (redefined)
-	//global controls6_a i.en_Curso Age_rounded i.en_Gender i.en_Cargo bs_saw_iat_feedback //bs_saw_iat_feedback = iat_feedback_option_or_not
+	*global controls6_a i.en_Curso Age_rounded i.en_Gender i.en_Cargo seen_iat_feedback seen_iat_feedback=iat_feedback_option_or_not
+	global controls6_a i.en_Curso Age_rounded i.en_Gender i.en_Cargo seen_iat_feedback 
 	*Analyze choice of receiving feedback depending on whether forced to take the IAT or opted in 
 
+
+	foreach y in en_iat_player_skipped en_iat_score iat_score_change en_iat_want_feedback en_iat_feedback_level {
+		preserve
+			drop if DNI==.
+			
+			merge 1:1 DNI using "$output\players_iat_feedback", gen(iat_merge)
+			drop participant_code session_code
+			
+			keep if iat_merge==3
+			codebook `y'
+			reg `y' $controls6_a,  cluster(Curso) 
+			
+		restore
+	}
+	
+	
 	local i = 1
 	foreach y in en_iat_player_skipped en_iat_score iat_score_change en_iat_want_feedback en_iat_feedback_level {
 		qui sum `y', d
@@ -200,9 +208,18 @@ feedback or not
 
 		reg `y' $controls7 ,  cluster(Curso) 
 		outreg2 using "$tables\iat_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
+		
 	}
 
-	**Looking at IAT results of only those who were forced to take the IAT - no selection issues at all
+	
+	/*-----------------------------------------
+	IAT - "Forced" participants
+	---
+	Note: Looking at IAT results of only those 
+	who were forced to take the IAT - no 
+	selection issues at all
+	-----------------------------------------*/
+	
 	local i = 1
 	foreach y in en_iat_score iat_score_change en_iat_want_feedback en_iat_feedback_level {
 		qui sum `y', d

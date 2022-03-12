@@ -17,7 +17,7 @@ set more off
 **setting up paths
 global main "D:\Accesos directos\Trabajo\World Bank\Peru Amag\peru-amag-stats"
 global data "$main\Data"
-global baseline "$data\Baseline raw\Last baseline data download"
+global baseline "$data\Baseline raw"
 
 global out_path "$main\output"
 cap mkdir "$out_path"
@@ -77,29 +77,39 @@ foreach file of global pagetime_files{ // iterating accross pagetime_files
 
 scalar num_pagetime_files = `=counter' - 1 // total number of pagetime_files
 
+
 ********
 **Storing DNIs per group of sessions
 ********
 scalar counter = 1 // file counter
 foreach file of global behavioral_files{ // iterating accross pagetime_files
-	import delimited `file', clear
+	import delimited `file', clear varnames(1)
 		
+		di "`file'"
 		* keeping only participant codes
 		keep participantlabel participantcode sessioncode
 		
 		* dropping unnecessary observations
-		drop if participantlabel == .
+		cap gen DNI = int(real(participantlabel))
+		cap rename participantlabel DNI
+		cap drop participantlabel
+		*destring(DNI), replace
+		
+		drop if missing(DNI)
+		
 		duplicates drop
+		codebook DNI
 		
 		* renaming vars for future merges
 		rename participantcode participant_code
-		rename participantlabel DNI
+		
 		
 		save "$aux_path\participant_dnis_`=counter'", replace
 		scalar counter = `=counter' + 1 // updating file counter
 }
 
 scalar num_behavioral_files = `=counter' - 1 // total number of pagetime_files
+
 
 ********
 **Creating a single file of unique codes
@@ -120,12 +130,14 @@ use "$aux_path\participant_ids_1", clear
 use "$aux_path\participant_dnis_1", clear
 	
 	forvalues i=2/`=num_behavioral_files'{ // appending all id files
+		di `i'
 		append using "$aux_path\participant_dnis_`i'"
 		save "$aux_path\participant_dnis", replace		
 	}
 	
 	duplicates drop
 	save "$aux_path\participant_dnis", replace
+
 
 /*----------------------
 Generating binary IAT Feedback indicator
@@ -137,6 +149,9 @@ Generating binary IAT Feedback indicator
 scalar counter = 1 // file counter
 foreach file of global pagetime_files{ // iterating accross pagetime_files
 	import delimited `file', clear
+		
+		di "`file'"
+		codebook participant_code
 		
 		*keeping the codes of participants who played the IAT
 		keep if page_name == "ResultI"
@@ -159,6 +174,7 @@ use "$aux_path\iat_feedback_codes_1", clear
 		save "$aux_path\iat_feedback_codes", replace
 	}
 	
+	duplicates drop
 	save "$aux_path\iat_feedback_codes", replace
 
 	
@@ -166,8 +182,10 @@ use "$aux_path\iat_feedback_codes_1", clear
 **Matching iat feedback data with participant_codes
 ********	
 use "$aux_path\participant_codes", clear
-	merge 1:1 participant_code using "$aux_path\iat_feedback_codes", nogen
+	merge m:1 participant_code using "$aux_path\iat_feedback_codes", nogen
 	replace seen_iat_feedback = 0 if missing(seen_iat_feedback)
+	
+	duplicates drop
 	save "$aux_path\participants_iat_feedback", replace
 	
 	
@@ -176,7 +194,7 @@ use "$aux_path\participant_codes", clear
 ********
 use "$aux_path\participant_dnis", clear
 	
-	merge 1:1 participant_code using "$aux_path\participants_iat_feedback", gen(consistency_identifier)
+	merge m:1 participant_code using "$aux_path\participants_iat_feedback", gen(consistency_identifier)
 	sort consistency_identifier
 	
 	*recovering missing session codes from pagetime data
@@ -188,13 +206,14 @@ use "$aux_path\participant_dnis", clear
 	label define consistency_labels 1 "Only on behavioral data" 2 "Only on pagetime data" 3 "Consistent" 
 	label values consistency_identifier consistency_labels 
 
-	keep if consistency_identifier == 3
-	drop consistency_identifier
+	*keep if consistency_identifier == 3
+	*drop consistency_identifier
 	
 	*droping duplicates based on DNI (only 1 obs in baseline with same value for seen iat)
-	duplicates drop DNI, force
+	*duplicates drop DNI, force
 	
 	save "$out_path\players_iat_feedback", replace
+
 	
 ********
 **Deleting aux data
