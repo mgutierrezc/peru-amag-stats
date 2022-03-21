@@ -14,7 +14,7 @@ set more off
 Setting up directories
 -----*/
 
-*di `"Please, input the path for storing the outputs of this dofile into the COMMAND WINDOW and then press ENTER  "'  _request(path)
+*di `"Please, input the main path where the required data for running this dofile is stored into the COMMAND WINDOW and then press ENTER  "'  _request(path)
 global path "D:\Accesos directos\Trabajo\World Bank\Peru Amag\peru-amag-stats"
 global data "$path\Data"
 global output "$path\output"
@@ -30,6 +30,7 @@ cap mkdir "$graphs"
 
 cd "$data"
 use "Clean_Full_Data12.dta"   /// stata 12 friendly
+
 
 /*=====
 Defining controls for all regressions - later in 
@@ -158,6 +159,8 @@ subsections other controls are added
 	gen socratic_actual = 0 if saw_video==0 
 	replace socratic_actual=1 if saw_video==1 & socratic_treated==1
 	
+	*generating squared age
+	gen age2 = Age_rounded^2
 	
 	/*-----
 	Creating Motivated Reasoning Variables
@@ -236,14 +239,20 @@ subsections other controls are added
 	lab var z_grade "Course Grade "
 	lab var z_pass "Pass Course"
 	
+	*Selection on observables for feedback
+	gen en_ignore_feedback = 0 if en_iat_want_feedback!=.
+	replace en_ignore_feedback =1 if en_iat_want_feedback==0 | en_iat_feedback_level==0 
+	
+	*Analyze choice of receiving feedback depending on whether forced to take the IAT or opted in 
+	gen iat_interaction = iat_feedback_option_or_not * iat_option_take_or_not
+	
+	*Creating squared bs iat score for analysis of non linear relations
+	gen z_bs_iat_score2 = z_bs_iat_score^2
+	
 	
 /*=====
 IAT take up of exercise and feedback
 =====*/
-
-	*Selection on observables for feedback
-	gen en_ignore_feedback = 0 if en_iat_want_feedback!=.
-	replace en_ignore_feedback =1 if en_iat_want_feedback==0 | en_iat_feedback_level==0 
 
 	
 	/*-----
@@ -251,17 +260,16 @@ IAT take up of exercise and feedback
 	-----*/
 	
 	*defining macros for controls
-	global controls2    i.en_Course Age_rounded i.en_Gender  i.en_Position
-	global controls6    i.en_Course Age_rounded i.en_Gender i.en_Position z_bs_iat_score
-	global controls6r   i.en_Course Age_rounded i.en_Gender i.en_Position iat_option_take_or_not   
-	global controls6iv  i.en_Course Age_rounded i.en_Gender i.en_Position (z_bs_iat_score=iat_option_take_or_not)
-	global controls7    i.en_Course Age_rounded i.en_Gender i.en_Position seen_iat_feedback  
-	global controls7r   i.en_Course Age_rounded i.en_Gender i.en_Position iat_feedback_option_or_not
-	global controls7iv i.en_Course Age_rounded i.en_Gender i.en_Position (seen_iat_feedback  = iat_feedback_option_or_not)
-	global controlsint  i.en_Course Age_rounded i.en_Gender i.en_Position iat_feedback_option_or_not##iat_option_take_or_not
+	global controls2    i.en_Course Age_rounded age2 i.en_Gender  i.en_Position
+	global controls6    i.en_Course Age_rounded age2 i.en_Gender i.en_Position z_bs_iat_score
+	global controls62   i.en_Course Age_rounded age2 i.en_Gender i.en_Position z_bs_iat_score z_bs_iat_score2
+	global controls6r   i.en_Course Age_rounded age2 i.en_Gender i.en_Position iat_option_take_or_not   
+	global controls6iv  i.en_Course Age_rounded age2 i.en_Gender i.en_Position (z_bs_iat_score=iat_option_take_or_not)
+	global controls7    i.en_Course Age_rounded age2 i.en_Gender i.en_Position seen_iat_feedback  
+	global controls7r   i.en_Course Age_rounded age2 i.en_Gender i.en_Position iat_feedback_option_or_not
+	global controls7iv i.en_Course Age_rounded age2 i.en_Gender i.en_Position (seen_iat_feedback  = iat_feedback_option_or_not)
+	global controlsint  i.en_Course Age_rounded age2 i.en_Gender i.en_Position iat_feedback_option_or_not##iat_option_take_or_not
 	
-	*Analyze choice of receiving feedback depending on whether forced to take the IAT or opted in 
-	gen iat_interaction = iat_feedback_option_or_not * iat_option_take_or_not
 	
 	*Regressions for standardized variables
 	local i = 1
@@ -286,7 +294,10 @@ IAT take up of exercise and feedback
 					
 		reg `y' $controls6r ,  cluster(Course) 
 		outreg2 using "$tables/iat_regs_.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-
+		
+		reg `y' $controls62 ,  cluster(Course) 
+		outreg2 using "$tables/iat_regs_.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
+		
 		*can't use IAT feedback variable
 // 		ivreg2 `y' $controls6iv,  cluster(Course) 
 // 		outreg2 using "$tables/iat_regs_.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
@@ -310,8 +321,8 @@ IAT take up of exercise and feedback
 	-----*/
 	
 	*defining controls for regressions
-	global controlsint   i.en_Course Age_rounded i.en_Gender i.en_Position iat_feedback_option_or_not##iat_option_take_or_not
-	global controlsinta  i.en_Course Age_rounded i.en_Gender i.en_Position i.iat_interaction
+	global controlsint   i.en_Course Age_rounded age2 i.en_Gender i.en_Position iat_feedback_option_or_not##iat_option_take_or_not
+	global controlsinta  i.en_Course Age_rounded age2 i.en_Gender i.en_Position i.iat_interaction
 	
 	*Regressions for standardized variables
 	foreach y of varlist z_en_motivated_reasoner z_en_motivated_intensity z_en_conf_bias z_en_motivated_info z_en_trolley_decision z_trolley_decision_change z_en_dictator_decision z_dictator_decision_change  z_en_redistribute_decision z_redistribute_decision_change z_en_iat_player_skipped   z_en_book_topic1 - z_en_book_topic4  z_sat_instructor z_sat_exp sat_course z_sat_avg z_grade z_pass { 
@@ -350,50 +361,11 @@ IAT take up of exercise and feedback
 		 note("Dependent variable is normalized to an index between 0 and 1." "Number of observations = `nobs'. Treatment coefficient: `coef1'." "P-value of F-test for coefficient equality of interaction term is `pval'. ", size(small)) ///
 		 caption("Estimations obtained from OLS regressions include the following controls: age, gender, course dummies and position dummies" , size(vsmall))
 		graph export "$graphs/`y'_1_iatint.png", replace
-
-		}
-
-
-	global controls6iv  (i.bs_iat_player_skipped=i.iat_option_take_or_not)  i.en_Course Age_rounded i.en_Gender i.en_Position  
-// 		global controls7iv  (i.seen_iat_feedback  = i.iat_feedback_option_or_not) i.en_Course Age_rounded i.en_Gender i.en_Position 
-
-	foreach y of varlist  z_en_iat_score  iat_score_change z_en_motivated_reasoner z_en_motivated_intensity z_en_conf_bias z_en_motivated_info z_en_trolley_decision z_trolley_decision_change z_en_dictator_decision z_dictator_decision_change  z_en_redistribute_decision z_redistribute_decision_change z_en_iat_player_skipped   z_en_book_topic1 - z_en_book_topic4  z_sat_instructor z_sat_exp sat_course z_sat_avg z_grade z_pass { 
-
-		*labels for plots
-		local mylabel : variable label `y'
-		*------------------------------*
-		* IVreg Model 1: see feedback
-		*------------------------------ *
-
-// 		ivreg2 `y' $controls7iv ,  cluster(Course)
-// 		* Store number of observations and coefficient
-// 		local nobs = e(N)
-// 		mat coef=e(b)
-// 		local coef1: di %5.3f el(coef,1,2)
-// 		local coef1 = trim("`coef1'")
-// 		* Computing p value of difference between groups
-//
-// 		test 1.seen_iat_feedback == 0.seen_iat_feedback
-// 		local pval : di %5.3f `r(p)'
-// 		local pval = trim("`pval'")
-// 		*Predicting margins
-// 		set scheme s1mono
-// 		margins seen_iat_feedback
-//
-// 		* Margins plot
-// 		marginsplot, recast(bar ) plotopts(barwidth(0.5) bargap(10)) ///
-// 		 ciopts(recast(rcap) color(black)) ylabel(, labsize(vsmall) angle(horizontal)) ///
-// 		 title("Saw IAT feedback and `mylabel'") ///
-// 		 xlabel(0 "No" 1 "Yes", noticks) xtitle("Saw IAT feedback") ///
-// 		 ytitle(`mylabel') ///
-// 		 graphregion(color(white)) ///t
-// 		 note("Dependent variable is normalized to an index between 0 and 1." "Number of observations = `nobs'. 'Seen IAT feedback'  coefficient: `coef1'." "P-value of F-test for seen IAT feedback coefficient equality across categories is `pval'. ", size(small)) ///
-// 		 caption("Instrumental variables regressions where the randomized option to receive feedback" ///
-// 		 "is the instrumental variable. Model includes the following independent variables: age, gender, course and position" , size(vsmall))
-//
-// 		graph export "$graphs/`y'_3_iviatfeedback.png", replace
-
 	}
+	
+	
+	global controls6iv  (i.bs_iat_player_skipped=i.iat_option_take_or_not)  i.en_Course Age_rounded age2 i.en_Gender i.en_Position  
+// 		global controls7iv  (i.seen_iat_feedback  = i.iat_feedback_option_or_not) i.en_Course Age_rounded i.en_Gender i.en_Position 
 	
 	*if player didn't choose whether to take the iat, it'll be considered as if he didn't skip it on baseline
 	replace  bs_iat_player_skipped  = 0 if   iat_option_take_or_not ==0

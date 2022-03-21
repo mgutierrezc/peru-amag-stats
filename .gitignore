@@ -146,4 +146,6 @@ Links (google drive and staging)/
 *.csv#
 *.dta
 *.xls
+*.xls#
 *.xlsx
+*.xlsx#
