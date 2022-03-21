@@ -162,6 +162,7 @@ subsections other controls are added
 	*generating squared age
 	gen age2 = Age_rounded^2
 	
+	
 	/*-----
 	Creating Motivated Reasoning Variables
 	
@@ -260,7 +261,7 @@ IAT take up of exercise and feedback
 	-----*/
 	
 	*defining macros for controls
-	global controls2    i.en_Course Age_rounded age2 i.en_Gender  i.en_Position
+	global controls2    i.en_Course Age_rounded age2 i.en_Gender i.en_Position
 	global controls6    i.en_Course Age_rounded age2 i.en_Gender i.en_Position z_bs_iat_score
 	global controls62   i.en_Course Age_rounded age2 i.en_Gender i.en_Position z_bs_iat_score z_bs_iat_score2
 	global controls6r   i.en_Course Age_rounded age2 i.en_Gender i.en_Position iat_option_take_or_not   
