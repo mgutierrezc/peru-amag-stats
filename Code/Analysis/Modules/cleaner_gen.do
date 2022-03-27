@@ -135,6 +135,7 @@ subsections other controls are added
 	
 	*generating squared age
 	gen age2 = Age_rounded^2
+	label var age2 "Age Squared"
 	
 	
 	/*-----

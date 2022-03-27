@@ -10,9 +10,9 @@ editor: Marco Gutierrez
 clear all
 set more off
 
-/*-----
+/*=====
 Setting up directories
------*/
+=====*/
 
 *di `"Please, input the main path where the required data for running this dofile is stored into the COMMAND WINDOW and then press ENTER  "'  _request(path)
 global path "D:\Accesos directos\Trabajo\World Bank\Peru Amag\peru-amag-stats"
@@ -32,7 +32,12 @@ cap mkdir "$graphs"
 cd "$data"
 use "Clean_Full_Data12.dta"   /// stata 12 friendly
 
+
+/*=====
+Cleaning and variable generation
+=====*/
 do "$modules\cleaner_gen.do"
+	
 	
 /*=====
 IAT take up of exercise and feedback

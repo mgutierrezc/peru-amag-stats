@@ -1,196 +1,61 @@
 cls
-/***********
-**Impact Analysis of Peru Amag project
-with Socratic Analysis - Regressions
+/*=============================
+Regressions for Peru Amag IAT
 
-Project: Peru-Amag
-Programmer: Ronak Jain/Mayumi Cornejo
-Editor: Marco Gutierrez
-***********/
+---
+author: Ronak Jain, Mayumi Cornejo, 
+Jose Maria Rodriguez Valadez
+editor: Marco Gutierrez
+=============================*/
 
-clear all 
+clear all
+set more off
 
-/*--------------
-Defining paths
---------------*/
+/*=====
+Setting up directories
+=====*/
 
 *di `"Please, input the main path where the required data for running this dofile is stored into the COMMAND WINDOW and then press ENTER  "'  _request(path)
-global main "D:\Accesos directos\Trabajo\World Bank\Peru Amag\peru-amag-stats"
-global data "$main\Data"
-global output "$main\output"
+global path "D:\Accesos directos\Trabajo\World Bank\Peru Amag\peru-amag-stats"
+global data "$path\Data"
+global output "$path\output"
+global modules "$path\Code\Analysis\Modules"
 
-global eval_analysis "$output\eval_analysis_w_feedback"
-cap mkdir "$eval_analysis"
-global tables "$eval_analysis\tables"
+global docs "$output\eval_regs"
+cap mkdir "$docs"
+
+global tables "$docs\tables"
 cap mkdir "$tables"
-global graphs "$eval_analysis\graphs"
+
+global graphs "$docs\graphs"
 cap mkdir "$graphs"
 
-use "$data\Clean_Full_Data.dta"  
+cd "$data"
+use "Clean_Full_Data12.dta"   /// stata 12 friendly
 
 
-*****************************************************
-*Defining controls for all regressions - later in subsections other controls are added
-*****************************************************
-	encode Cargo, gen(en_Cargo)
-	encode Curso, gen(en_Curso)
-	encode Género, gen(en_Gender)
+/*=====
+Cleaning and variable generation
+=====*/
+	do "$modules\cleaner_gen.do"
+	rename age2 Age_squared
+	
 
-	lab def position 1 Assistant 2 Auxiliary 3 Prosecutor 4 Judge
-	lab val en_Cargo position
-	lab def courses 1 Convention_Constitution 2 Constitutional_Interpretation 3 Jurisprudence 4 Reasoning 5 Virtues_Principles 6 Ethics
-	lab val en_Curso courses 
-	lab def gender 1 Female 2 Male
-	lab val en_Gender gender
-
-	tab Cargo, gen(cargo_)
-	tab Curso, gen(curso_)
-	tab Género, gen(gender_)
-
-	lab var curso_1 Convention_Constitution
-	lab var curso_2 Constitional_Interpretation
-	lab var curso_3 Jurisprudence
-	lab var curso_4 Reasoning
-	lab var curso_5 Virtues_Principles
-	lab var curso_6 Ethics
-
-	lab var cargo_1 Assistant
-	lab var cargo_2 Auxiliary
-	lab var cargo_3 Prosecutor
-	lab var cargo_4 Judge
-
-	lab var gender_1 Female
-	lab var gender_2 Male
-
-	**First set of controls
-	global controls1 i.en_Curso 
-	global controls2 i.en_Curso Age_rounded i.en_Gender i.en_Cargo
+/*=====
+Selection on observables
+=====*/
+	orth_out position_* course_* gender_1 Age_rounded using "$tables\selection.xlsx", by(en_Estado_de_Cuestionario) pcompare stars se sheet(selection_en) sheetreplace
+	orth_out position_* course_* gender_1 Age_rounded using "$tables\selection.xlsx", by(bs_Estado_de_Cuestionario) pcompare stars se sheet(selection_bs) sheetreplace
 
 
-*****************************************************
-*Attrition and selection on observables
-*****************************************************
-	*Attrition for those who completed at baseline but not endline
-	gen attrition=.
-	replace attrition = 0 if bs_Estado_de_Cuestionario=="Completo"
-	replace attrition = 1 if (regex(en_Estado_de_Cuestionario,"Comenzo") | regex(en_Estado_de_Cuestionario,"Falta")) & bs_Estado_de_Cuestionario=="Completo"
-	tab attrition
+/*=====
+Changes in Behavior: Motivated reasoning, 
+Curiosity and Confirmation Bias
+=====*/	
 
-	qui sum attrition, d
-	local mean = round(`r(mean)', 0.001) 
-	reg attrition $controls2 ,  cluster(Curso) 
-	outreg2 using "$tables\attrition.xls", replace stats(coef pval ) level(95) addtext(mean, `mean') label
+	do "$modules\motiv_curios_conf_bias.do"
 
-	*Selection on obaservables 
-	orth_out cargo_* curso_* gender_1 Age_rounded using "$tables\selection.xlsx", by(en_Estado_de_Cuestionario) pcompare stars se sheet(selection_en) sheetreplace
-	orth_out cargo_* curso_* gender_1 Age_rounded using "$tables\selection.xlsx", by(bs_Estado_de_Cuestionario) pcompare stars se sheet(selection_bs) sheetreplace
-
-
-*****************************************************
-*Motivated Reasoning
-*****************************************************
-//Note: The way the question was asked the values capture the chance it was true news
-	foreach x in bs en {
-		*motivated reasoner dummy
-		tab `x'_motivated_fakenews if `x'_participant_merge==3, m 
-		gen `x'_motivated_reasoner=0 if `x'_motivated_fakenews==5 & `x'_participant_merge==3 
-		replace `x'_motivated_reasoner =1 if `x'_motivated_fakenews!=. & `x'_motivated_fakenews!=5 & `x'_participant_merge==3
-		tab `x'_motivated_reasoner
-		
-		*extent of motivated reasoning
-		gen `x'_motivated_intensity =abs(5-`x'_motivated_fakenews) if `x'_motivated_fakenews!=. & `x'_participant_merge==3
-		tab `x'_motivated_intensity
-	}
-
-	**Second set of controls
-	global controls3 i.en_Curso Age_rounded i.en_Gender i.en_Cargo bs_motivated_reasoner 
-	global controls4 i.en_Curso Age_rounded i.en_Gender i.en_Cargo en_motivated_newsh bs_motivated_reasoner ///direction of motivated reasoning on average 
-
-	local i = 1
-	foreach y in en_motivated_reasoner en_motivated_intensity {
-		qui sum `y', d
-		local mean = round(`r(mean)', 0.001) 
-	reg `y' $controls1 ,  cluster(Curso) 
-
-		if(`i'==1){
-	outreg2 using "$tables\motivated_reasoning_regs.xls", replace stats(coef pval ) level(95) addtext(mean, `mean') label
-		} 
-		else{
-			outreg2 using "$tables\motivated_reasoning_regs.xls", append stats(coef pval ) level(95) addtext(mean, `mean') label
-				}
-
-				local i = `i' + 1
-				
-	reg `y' $controls2 ,  cluster(Curso) 
-
-		if(`i'==1){
-	outreg2 using "$tables\motivated_reasoning_regs.xls", replace stats(coef pval ) level(95) addtext(mean, `mean') label
-		} 
-		else{
-			outreg2 using "$tables\motivated_reasoning_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-				}
-				
-	reg `y' $controls3 ,  cluster(Curso) 
-
-		if(`i'==1){
-	outreg2 using "$tables\motivated_reasoning_regs.xls", replace stats(coef pval ) level(95)  addtext(mean, `mean') label
-		} 
-		else{
-			outreg2 using "$tables\motivated_reasoning_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-				}
-				
-	reg `y' $controls4 ,  cluster(Curso) 
-
-		if(`i'==1){
-	outreg2 using "$tables\motivated_reasoning_regs.xls", replace stats(coef pval ) level(95)  addtext(mean, `mean') label
-		} 
-		else{
-			outreg2 using "$tables\motivated_reasoning_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-				}
-	}
-
-	*confirmation bias 
-	*-> whether clicked on both briefs (and order if can extract time stamps)
-	//Note: currently also counting those who did not click ay brief as exhibiting confirmation bias
-	foreach x in bs en {
-		gen `x'_conf_bias=1 if  `x'_Estado_de_Cuestionario=="Completo" //& (`x'_motivated_click_arga!=. | `x'_motivated_click_argb!=. )
-		replace `x'_conf_bias=0 if `x'_motivated_click_arga!=. & `x'_motivated_click_argb!=. & `x'_Estado_de_Cuestionario=="Completo"
-		tab `x'_conf_bias
-	} 
-
-	**Third set of controls
-	global controls5 i.en_Curso Age_rounded i.en_Gender i.en_Cargo bs_conf_bias 
-
-	foreach y in en_conf_bias {
-		qui sum `y', d
-		local mean = round(`r(mean)', 0.001) 
-	reg `y' $controls1 ,  cluster(Curso) 
-	outreg2 using "$tables\conf_bias_regs.xls", replace stats(coef pval ) level(95) addtext(mean, `mean') label
-				
-	reg `y' $controls2 ,  cluster(Curso) 
-	outreg2 using "$tables\conf_bias_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-				
-	reg `y' $controls5 ,  cluster(Curso) 
-	outreg2 using "$tables\conf_bias_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-	}
-
-	*Curiosity
-	**Third set of controls (redefined)
-	global controls5 i.en_Curso Age_rounded i.en_Gender i.en_Cargo bs_motivated_info
-
-	foreach y in en_motivated_info {
-		qui sum `y', d
-		local mean = round(`r(mean)', 0.001) 
-	reg `y' $controls1 ,  cluster(Curso) 
-	outreg2 using "$tables\curiosity_regs.xls", replace stats(coef pval ) level(95) addtext(mean, `mean') label
-				
-	reg `y' $controls2 ,  cluster(Curso) 
-	outreg2 using "$tables\curiosity_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-				
-	reg `y' $controls3 ,  cluster(Curso) 
-	outreg2 using "$tables\curiosity_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-	}
-
+	
 **********************************************************************************************************
 ***IAT take up of exercise and feedback
 *Analyze selection on observables for those who choose to take the test 
@@ -218,12 +83,12 @@ use "$data\Clean_Full_Data.dta"
 	//need to check with Chris
 
 	**Fourth set of controls
-	global controls6 i.en_Curso Age_rounded i.en_Gender i.en_Cargo bs_iat_score
-	//global controls6iv i.en_Curso Age_rounded i.en_Gender i.en_Cargo (bs_iat_score=iat_option_take_or_not) 
-	global controls7 i.en_Curso Age_rounded i.en_Gender i.en_Cargo iat_option_take_or_not  //iat_feedback_option_or_not
+	global controls6 i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo bs_iat_score
+	//global controls6iv i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo (bs_iat_score=iat_option_take_or_not) 
+	global controls7 i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo iat_option_take_or_not  //iat_feedback_option_or_not
 
 	**Fourth set of controls (redefined)
-	//global controls6_a i.en_Curso Age_rounded i.en_Gender i.en_Cargo bs_saw_iat_feedback //bs_saw_iat_feedback = iat_feedback_option_or_not
+	//global controls6_a i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo bs_saw_iat_feedback //bs_saw_iat_feedback = iat_feedback_option_or_not
 	*Analyze choice of receiving feedback depending on whether forced to take the IAT or opted in 
 
 	local i = 1
@@ -325,7 +190,7 @@ use "$data\Clean_Full_Data.dta"
 	gen trolley_version = bs_trolley_treatment
 	replace trolley_version=en_trolley_treat if bs_trolley_treatment==""
 	encode trolley_version, gen(en_trolley_version)
-	global controls8 i.en_Curso Age_rounded i.en_Gender i.en_Cargo i.en_trolley_version
+	global controls8 i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo i.en_trolley_version
 
 	local i = 1
 	foreach y in en_trolley_decision trolley_decision_change {
@@ -396,11 +261,11 @@ use "$data\Clean_Full_Data.dta"
 //conf_bias
 
 	global controls1 i.en_Curso 
-	global controls2 i.en_Curso Age_rounded i.en_Gender i.en_Cargo
-	global controls_trolley i.en_Curso Age_rounded i.en_Gender i.en_Cargo bs_trolley_decision
-	global controls_iatfeedback i.en_Curso Age_rounded i.en_Gender i.en_Cargo bs_iat_want_feedback
-	global controls_confbias i.en_Curso Age_rounded i.en_Gender i.en_Cargo bs_conf_bias
-	global controls_motivated i.en_Curso Age_rounded i.en_Gender i.en_Cargo bs_motivated_reasoner
+	global controls2 i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo
+	global controls_trolley i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo bs_trolley_decision
+	global controls_iatfeedback i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo bs_iat_want_feedback
+	global controls_confbias i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo bs_conf_bias
+	global controls_motivated i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo bs_motivated_reasoner
 
 	reg en_trolley_decision $controls_trolley ,  cluster(Curso) 
 	coefplot, drop(Age_rounded i.en_Gender i.en_Cargo) xline(0) subtitle(, size(large) margin(medium) justification(left) color(white) bcolor(black) bmargin(top_bottom)) title("Utilitarian Preference by Course") saving("$graphs\trolley1.gph", replace) 
