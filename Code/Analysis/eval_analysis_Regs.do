@@ -1,7 +1,7 @@
 cls
 /***********
 **Impact Analysis of Peru Amag project
-with Socratic Analysis
+with Socratic Analysis - Regressions
 
 Project: Peru-Amag
 Programmer: Ronak Jain/Mayumi Cornejo
@@ -14,6 +14,7 @@ clear all
 Defining paths
 --------------*/
 
+*di `"Please, input the main path where the required data for running this dofile is stored into the COMMAND WINDOW and then press ENTER  "'  _request(path)
 global main "D:\Accesos directos\Trabajo\World Bank\Peru Amag\peru-amag-stats"
 global data "$main\Data"
 global output "$main\output"
@@ -26,6 +27,7 @@ global graphs "$eval_analysis\graphs"
 cap mkdir "$graphs"
 
 use "$data\Clean_Full_Data.dta"  
+
 
 *****************************************************
 *Defining controls for all regressions - later in subsections other controls are added
