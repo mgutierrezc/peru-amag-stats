@@ -356,11 +356,11 @@ IAT take up of exercise and feedback
 		 ciopts(recast(rcap) color(black)) ylabel(, labsize(vsmall) angle(horizontal)) x(iat_option_take_or_not) ///
 		 title("IAT treatments and `mylabel'") ///
 		  xscale(range(-0.5 1.5)) ///
-		 xlabel(0 "No option" 1 "Option to take" , labsize(small) noticks) xtitle("Option to skip IAT test", size(small)) ///
-		 ytitle(`mylabel') ///  
+		 xlabel(0 "No option" 1 "Option to skip" , labsize(small) noticks) xtitle("RHS: Option to skip IAT test (base/end)", size(small)) ///
+		 ytitle("LHS: `mylabel' (end)") ///  
 		 graphregion(color(white)) ///
 		 note("Dependent variable is normalized to an index between 0 and 1." "Number of observations = `nobs'. Treatment coefficient: `coef1'." "P-value of F-test for coefficient equality of interaction term is `pval'. ", size(small)) ///
-		 caption("Estimations obtained from OLS regressions include the following controls: age, gender, course dummies and position dummies" , size(vsmall))
+		 caption("Estimations obtained from OLS regressions include the following controls: age, age squared, gender, course dummies and position dummies" , size(vsmall))
 		graph export "$graphs/`y'_1_iatint.png", replace
 	}
 	
@@ -397,12 +397,12 @@ IAT take up of exercise and feedback
 		marginsplot, recast(bar ) plotopts(barwidth(0.5) bargap(10)) ///
 		 ciopts(recast(rcap) color(black)) ylabel(, labsize(vsmall) angle(horizontal)) ///
 		 title("Skipped IAT and `mylabel'") ///
-		 xlabel(0 "No" 1 "Yes", noticks) xtitle("Skip IAT") ///
-		 ytitle(`mylabel') ///
+		 xlabel(0 "No" 1 "Yes", noticks) xtitle("RHS: Player skipped IAT (baseline)") ///
+		 ytitle("LHS: `mylabel' (end)") ///
 		 graphregion(color(white)) ///
 		 note("Dependent variable is normalized to an index between 0 and 1." "Number of observations = `nobs'. 'Skipped IAT' coefficient: `coef1'." "P-value of F-test for skipped IAT coefficient equality across categories is `pval'. ", size(small)) ///
 		 caption("Instrumental variables regressions where the randomized option to skip the IAT test" ///
-		 "is the instrumental variable. Model includes the following independent variables: age, gender, course and position" , size(vsmall))
+		 "is the instrumental variable. Model includes the following independent variables: age, age squared, gender, course and position" , size(vsmall))
 
 		graph export "$graphs/`y'_2_iviatskip.png", replace
 
