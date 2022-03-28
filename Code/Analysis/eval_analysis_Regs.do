@@ -55,103 +55,17 @@ Curiosity and Confirmation Bias
 
 	do "$modules\motiv_curios_conf_bias.do"
 
+/*=====
+Changes in Behavior: Gender Biases
+IAT
+=====*/
+
+	do "$modules\iat_regs.do"
 	
-**********************************************************************************************************
-***IAT take up of exercise and feedback
-*Analyze selection on observables for those who choose to take the test 
-*Analyze selection on observables for receiving feedback or not 
-**********************************************************************************************************
-	*Selection on observables for takeup
-	orth_out cargo_* curso_* gender_1 Age_rounded using "$tables\iat_selection.xlsx" if iat_option_take_or_not==1, by(en_iat_player_skipped) pcompare stars se sheet(selection_iat_takeup) sheetreplace
 
-	**Selection on observables for feedback
-	gen en_ignore_feedback = 0 if en_iat_want_feedback!=.
-	replace en_ignore_feedback =1 if en_iat_want_feedback==0 | en_iat_feedback_level==0 
-
-	orth_out cargo_* curso_* gender_1 Age_rounded using "$tables\iat_selection.xlsx" if iat_feedback_option_or_not==1, by(en_ignore_feedback) pcompare stars se sheet(selection_iat_feedback) sheetreplace
-
-	*****************************************************
-	*IAT scores
-	*****************************************************
-	gen iat_score_change = en_iat_score-bs_iat_score
-
-	*creating a dummy for whether they saw their feedback at baseline
-	gen bs_saw_iat_feedback=0 if bs_iat_score!=.
-	replace bs_saw_iat_feedback=1 if bs_iat_feedback_descriptive!="" & regex(bs_iat_feedback_descriptive, "No fue")==0
-	tab bs_saw_iat_feedback
-	count if bs_iat_score!=. //problem is that there is no variable which demarcates if the person was shown or not shown their feedback as bs_iat_feedback_descriptive is there for all the people so not sure who was not shown their feedback
-	//need to check with Chris
-
-	**Fourth set of controls
-	global controls6 i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo bs_iat_score
-	//global controls6iv i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo (bs_iat_score=iat_option_take_or_not) 
-	global controls7 i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo iat_option_take_or_not  //iat_feedback_option_or_not
-
-	**Fourth set of controls (redefined)
-	//global controls6_a i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo bs_saw_iat_feedback //bs_saw_iat_feedback = iat_feedback_option_or_not
-	*Analyze choice of receiving feedback depending on whether forced to take the IAT or opted in 
-
-	local i = 1
-	foreach y in en_iat_player_skipped en_iat_score iat_score_change en_iat_want_feedback en_iat_feedback_level {
-		qui sum `y', d
-		local mean = round(`r(mean)', 0.001) 
-		
-		reg `y' $controls1 ,  cluster(Curso) 
-		if(`i'==1){
-			outreg2 using "$tables\iat_regs.xls", replace stats(coef pval ) level(95) addtext(mean, `mean') label
-			} 
-		else{
-			outreg2 using "$tables\iat_regs.xls", append stats(coef pval ) level(95) addtext(mean, `mean') label
-			}
-					
-		local i = `i' + 1
-					
-		reg `y' $controls2 ,  cluster(Curso) 
-		outreg2 using "$tables\iat_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-					
-		reg `y' $controls6 ,  cluster(Curso) 
-		outreg2 using "$tables\iat_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean', ctrls, "6") label
-
-		//ivreg2 `y' $controls6iv,  cluster(Curso) 
-		//outreg2 using iat_regs.xls, append stats(coef pval ) level(95)  addtext(mean, `mean') label
-
-		reg `y' $controls7 ,  cluster(Curso) 
-		outreg2 using "$tables\iat_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-	}
-
-	***Looking at IAT results of only those who were forced to take the IAT - no selection issues at all
-	local i = 1
-	foreach y in en_iat_score iat_score_change en_iat_want_feedback en_iat_feedback_level {
-		qui sum `y', d
-		local mean = round(`r(mean)', 0.001) 
-		
-		reg `y' $controls1 if iat_option_take_or_not==0,  cluster(Curso) 
-		if(`i'==1){
-			outreg2 using "$tables\iat_regs_forced.xls", replace stats(coef pval ) level(95) addtext(mean, `mean') label
-			} 
-		else{
-			outreg2 using "$tables\iat_regs_forced.xls", append stats(coef pval ) level(95) addtext(mean, `mean') label
-			}
-					
-		local i = `i' + 1
-					
-		reg `y' $controls2 if iat_option_take_or_not==0,  cluster(Curso) 
-		outreg2 using "$tables\iat_regs_forced.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-					
-		reg `y' $controls6 if iat_option_take_or_not==0,  cluster(Curso) 
-		outreg2 using "$tables\iat_regs_forced.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-
-		//ivreg2 `y' $controls6iv if iat_option_take_or_not==0,  cluster(Curso) 
-		//outreg2 using iat_regs_forced.xls, append stats(coef pval ) level(95)  addtext(mean, `mean') label
-
-		reg `y' $controls7 if iat_option_take_or_not==0,  cluster(Curso) 
-		outreg2 using "$tables\iat_regs_forced.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
-	}
-
-
-	*****************************************************
-	*Altruism and Redistribution 
-	*****************************************************
+*****************************************************
+*Altruism and Redistribution 
+*****************************************************
 	ren en_dictator_player_decision en_dictator_decision
 	ren en_redistribute_player_decision en_redistribute_decision
 	ren bs_dictator_player_decision bs_dictator_decision
@@ -167,7 +81,7 @@ Curiosity and Confirmation Bias
 		qui sum `y', d
 		local mean = round(`r(mean)', 0.001) 
 		
-	reg `y' $controls1 ,  cluster(Curso) 
+	reg `y' $controls1 ,  cluster(Course) 
 	if(`i'==1){
 	outreg2 using "$tables\altruism_redistri_regs.xls", replace stats(coef pval ) level(95) addtext(mean, `mean') label
 		} 
@@ -177,7 +91,7 @@ Curiosity and Confirmation Bias
 				
 	local i = `i' + 1
 				
-	reg `y' $controls2 ,  cluster(Curso) 
+	reg `y' $controls2 ,  cluster(Course) 
 	outreg2 using "$tables\altruism_redistri_regs.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
 	}
 
@@ -190,14 +104,14 @@ Curiosity and Confirmation Bias
 	gen trolley_version = bs_trolley_treatment
 	replace trolley_version=en_trolley_treat if bs_trolley_treatment==""
 	encode trolley_version, gen(en_trolley_version)
-	global controls8 i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo i.en_trolley_version
+	global controls8 i.en_Course Age_rounded Age_squared i.en_Gender i.en_Position i.en_trolley_version
 
 	local i = 1
 	foreach y in en_trolley_decision trolley_decision_change {
 		qui sum `y', d
 		local mean = round(`r(mean)', 0.001) 
 		
-	reg `y' $controls1 ,  cluster(Curso) 
+	reg `y' $controls1 ,  cluster(Course) 
 	if(`i'==1){
 	outreg2 using "$tables\trolley.xls", replace stats(coef pval ) level(95) addtext(mean, `mean') label
 		} 
@@ -207,11 +121,11 @@ Curiosity and Confirmation Bias
 				
 	local i = `i' + 1
 				
-	reg `y' $controls2 ,  cluster(Curso) 
+	reg `y' $controls2 ,  cluster(Course) 
 	outreg2 using "$tables\trolley.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
 
 				
-	reg `y' $controls8 ,  cluster(Curso) 
+	reg `y' $controls8 ,  cluster(Course) 
 	outreg2 using "$tables\trolley.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
 	}
 
@@ -231,7 +145,7 @@ Curiosity and Confirmation Bias
 		qui sum `y', d
 		local mean = round(`r(mean)', 0.001) 
 		
-	reg `y' $controls1 ,  cluster(Curso) 
+	reg `y' $controls1 ,  cluster(Course) 
 	if(`i'==1){
 	outreg2 using "$tables\book_choice.xls", replace stats(coef pval ) level(95) addtext(mean, `mean') label
 		} 
@@ -241,7 +155,7 @@ Curiosity and Confirmation Bias
 				
 	local i = `i' + 1
 				
-	reg `y' $controls2 ,  cluster(Curso) 
+	reg `y' $controls2 ,  cluster(Course) 
 	outreg2 using "$tables\book_choice.xls", append stats(coef pval ) level(95)  addtext(mean, `mean') label
 
 	}
@@ -260,42 +174,42 @@ Curiosity and Confirmation Bias
 //en_iat_want_feedback
 //conf_bias
 
-	global controls1 i.en_Curso 
-	global controls2 i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo
-	global controls_trolley i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo bs_trolley_decision
-	global controls_iatfeedback i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo bs_iat_want_feedback
-	global controls_confbias i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo bs_conf_bias
-	global controls_motivated i.en_Curso Age_rounded Age_squared i.en_Gender i.en_Cargo bs_motivated_reasoner
+	global controls1 i.en_Course 
+	global controls2 i.en_Course Age_rounded Age_squared i.en_Gender i.en_Position
+	global controls_trolley i.en_Course Age_rounded Age_squared i.en_Gender i.en_Position bs_trolley_decision
+	global controls_iatfeedback i.en_Course Age_rounded Age_squared i.en_Gender i.en_Position bs_iat_want_feedback
+	global controls_confbias i.en_Course Age_rounded Age_squared i.en_Gender i.en_Position bs_conf_bias
+	global controls_motivated i.en_Course Age_rounded Age_squared i.en_Gender i.en_Position bs_motivated_reasoner
 
-	reg en_trolley_decision $controls_trolley ,  cluster(Curso) 
-	coefplot, drop(Age_rounded i.en_Gender i.en_Cargo) xline(0) subtitle(, size(large) margin(medium) justification(left) color(white) bcolor(black) bmargin(top_bottom)) title("Utilitarian Preference by Course") saving("$graphs\trolley1.gph", replace) 
+	reg en_trolley_decision $controls_trolley ,  cluster(Course) 
+	coefplot, drop(Age_rounded i.en_Gender i.en_Position) xline(0) subtitle(, size(large) margin(medium) justification(left) color(white) bcolor(black) bmargin(top_bottom)) title("Utilitarian Preference by Course") saving("$graphs\trolley1.gph", replace) 
 
-	reg trolley_decision_change $controls2 ,  cluster(Curso) 
-	coefplot, drop(Age_rounded i.en_Gender i.en_Cargo) xline(0) subtitle(, size(large) margin(medium) justification(left) color(white) bcolor(black) bmargin(top_bottom)) title("Utilitarian Preference Change by Course") saving("$graphs\trolley2.gph", replace) 
+	reg trolley_decision_change $controls2 ,  cluster(Course) 
+	coefplot, drop(Age_rounded i.en_Gender i.en_Position) xline(0) subtitle(, size(large) margin(medium) justification(left) color(white) bcolor(black) bmargin(top_bottom)) title("Utilitarian Preference Change by Course") saving("$graphs\trolley2.gph", replace) 
 
 	graph combine "$graphs\trolley1.gph" "$graphs\trolley2.gph", ycommon saving("$graphs\AmagExhibit1", replace)
 
-	reg en_book_topic4 $controls2 ,  cluster(Curso) 
-	coefplot, drop(Age_rounded i.en_Gender i.en_Cargo) xline(0) subtitle(, size(large) margin(medium) justification(left) color(white) bcolor(black) bmargin(top_bottom)) title("Book: Just Decision") saving("$graphs\book1.gph", replace) 
+	reg en_book_topic4 $controls2 ,  cluster(Course) 
+	coefplot, drop(Age_rounded i.en_Gender i.en_Position) xline(0) subtitle(, size(large) margin(medium) justification(left) color(white) bcolor(black) bmargin(top_bottom)) title("Book: Just Decision") saving("$graphs\book1.gph", replace) 
 
-	reg en_book_topic5 $controls2 ,  cluster(Curso) 
-	coefplot, drop(Age_rounded i.en_Gender i.en_Cargo) xline(0) subtitle(, size(large) margin(medium) justification(left) color(white) bcolor(black) bmargin(top_bottom)) title("Book: Reasoning") saving("$graphs\book2.gph", replace) 
+	reg en_book_topic5 $controls2 ,  cluster(Course) 
+	coefplot, drop(Age_rounded i.en_Gender i.en_Position) xline(0) subtitle(, size(large) margin(medium) justification(left) color(white) bcolor(black) bmargin(top_bottom)) title("Book: Reasoning") saving("$graphs\book2.gph", replace) 
 
 	graph combine "$graphs\book1.gph" "$graphs\book2.gph", ycommon saving("$graphs\AmagExhibit2", replace)
 
-	reg iat_score_change $controls2 ,  cluster(Curso) 
-	coefplot, drop(Age_rounded i.en_Gender i.en_Cargo) xline(0) subtitle(, size(large) margin(medium) justification(left) color(white) bcolor(black) bmargin(top_bottom)) title("IAT score change") saving("$graphs\iat_score_change.gph", replace)
+	reg iat_score_change $controls2 ,  cluster(Course) 
+	coefplot, drop(Age_rounded i.en_Gender i.en_Position) xline(0) subtitle(, size(large) margin(medium) justification(left) color(white) bcolor(black) bmargin(top_bottom)) title("IAT score change") saving("$graphs\iat_score_change.gph", replace)
 
-	reg en_iat_want_feedback $controls_iatfeedback ,  cluster(Curso) 
-	coefplot, drop(Age_rounded i.en_Gender i.en_Cargo) xline(0) subtitle(, size(large) margin(medium) justification(left) color(white) bcolor(black) bmargin(top_bottom)) title("Whether want feedback for IAT") saving("$graphs\iat_feedback.gph", replace) 
+	reg en_iat_want_feedback $controls_iatfeedback ,  cluster(Course) 
+	coefplot, drop(Age_rounded i.en_Gender i.en_Position) xline(0) subtitle(, size(large) margin(medium) justification(left) color(white) bcolor(black) bmargin(top_bottom)) title("Whether want feedback for IAT") saving("$graphs\iat_feedback.gph", replace) 
 
 	graph combine "$graphs\book1.gph" "$graphs\book2.gph", ycommon saving("$graphs\AmagExhibit3", replace)
 
-	reg en_motivated_reasoner $controls_motivated ,  cluster(Curso) 
-	coefplot, drop(Age_rounded i.en_Gender i.en_Cargo) xline(0) subtitle(, size(large) margin(medium) justification(left) color(white) bcolor(black) bmargin(top_bottom)) title("Motivated reasoning") saving("$graphs\motivated.gph", replace) 
+	reg en_motivated_reasoner $controls_motivated ,  cluster(Course) 
+	coefplot, drop(Age_rounded i.en_Gender i.en_Position) xline(0) subtitle(, size(large) margin(medium) justification(left) color(white) bcolor(black) bmargin(top_bottom)) title("Motivated reasoning") saving("$graphs\motivated.gph", replace) 
 
-	reg en_conf_bias $controls_confbias ,  cluster(Curso) 
-	coefplot, drop(Age_rounded i.en_Gender i.en_Cargo) xline(0) subtitle(, size(large) margin(medium) justification(left) color(white) bcolor(black) bmargin(top_bottom)) title("Confirmation Bias") saving("$graphs\conf_bias.gph", replace) 
+	reg en_conf_bias $controls_confbias ,  cluster(Course) 
+	coefplot, drop(Age_rounded i.en_Gender i.en_Position) xline(0) subtitle(, size(large) margin(medium) justification(left) color(white) bcolor(black) bmargin(top_bottom)) title("Confirmation Bias") saving("$graphs\conf_bias.gph", replace) 
 
 	graph combine "$graphs\motivated.gph" "$graphs\conf_bias.gph" , ycommon saving("$graphs\AmagExhibit4", replace)
 
