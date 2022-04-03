@@ -184,7 +184,7 @@ subsections other controls are added
 	-----*/
 	
 	*generating dependent variables
-	foreach var of varlist en_iat_score  bs_iat_score iat_score_change en_motivated_reasoner en_motivated_intensity en_conf_bias en_motivated_info en_trolley_decision trolley_decision_change en_dictator_decision dictator_decision_change  en_redistribute_decision redistribute_decision_change en_iat_player_skipped   en_book_topic1 - en_book_topic4  sat_instructor sat_exp sat_course sat_avg grade pass {
+	foreach var of varlist en_iat_score  bs_iat_score iat_score_change en_iat_feedback_level en_motivated_reasoner en_motivated_intensity en_conf_bias en_motivated_info en_trolley_decision trolley_decision_change en_dictator_decision dictator_decision_change  en_redistribute_decision redistribute_decision_change en_iat_player_skipped   en_book_topic1 - en_book_topic4  sat_instructor sat_exp sat_course sat_avg grade pass {
 		qui sum `var'
 		gen z_`var' = (`var' - `r(min)') / (`r(max)'-`r(min)')
 	}
