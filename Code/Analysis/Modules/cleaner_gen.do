@@ -214,6 +214,10 @@ subsections other controls are added
 	lab var z_sat_avg "Satisfaction: average"
 	lab var z_grade "Course Grade "
 	lab var z_pass "Pass Course"
+	lab var en_iat_want_feedback "Player wants feedback"
+	lab var z_en_iat_feedback_level "Player's feedback level"
+	lab var iat_option_take_or_not "Option to Take IAT"
+	lab var iat_feedback_option_or_not "Option to Receive Feedback"
 	
 	*Selection on observables for feedback
 	gen en_ignore_feedback = 0 if en_iat_want_feedback!=.
@@ -221,6 +225,7 @@ subsections other controls are added
 	
 	*Analyze choice of receiving feedback depending on whether forced to take the IAT or opted in 
 	gen iat_interaction = iat_feedback_option_or_not * iat_option_take_or_not
+	lab var iat_interaction "IAT and Feedback options"
 	
 	*Creating squared bs iat score for analysis of non linear relations
 	gen z_bs_iat_score2 = z_bs_iat_score^2
