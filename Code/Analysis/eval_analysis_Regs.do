@@ -1,6 +1,6 @@
 cls
 /*=============================
-Regressions for Peru Amag IAT
+Regressions for Peru Amag II
 
 ---
 author: Ronak Jain, Mayumi Cornejo, 
