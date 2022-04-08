@@ -89,28 +89,15 @@ Programmer: Marco Gutierrez
 	regressions
 	---*/
 	
-	set scheme s1mono // setting up scheme
+	 set scheme plotplain // setting up scheme
 	
-	**plotting only reg coeffs from regs with ctrls
-	coefplot var1_r1_2 var2_r1_2 var3_r1_2 var4_r1_2 var1_r2_2 var2_r2_2 , keep(iat_option_take_or_not iat_feedback_option_or_not) xline(0) title("IATesteo sandungueo :v") xtitle("Point Estimates with 95% CIs (Metrics Assigned)") xlabel(-1.0(1)1.0) xscale(range(-1.0(1)1.0)) mlabel format(%9.3f) mlabposition(12) mlabgap(*1) level(95) legend(pos(4) col(1)) ylabel(0.62 "Want Feedback (End)" 0.78 "Want Feedback - Level (End)" 0.96 "Score Change" 1.08 "Score (End)" 2.21 "Score Change (End)" 2.34 "Score (End)")
+	**1st and 2nd rand level plots (plotting only reg coeffs from regs with ctrls)
+	coefplot var1_r1_2 var2_r1_2 var3_r1_2 var4_r1_2 var1_r2_2 var2_r2_2 , keep(iat_option_take_or_not iat_feedback_option_or_not) xline(0) title("IAT treatments and outcomes") xtitle("Point Estimates with 95% CIs (Standardized outcomes)") xlabel(-1.0(1)1.0) xscale(range(-1.0(1)1.0)) mlabel format(%9.3f) mlabposition(12) mlabgap(*1) level(95) ylabel(0.62 "Want Feedback (End)" 0.78 "Want Feedback - Level (End)" 0.96 "Score Change" 1.08 "Score (End)" 2.21 "Score Change (End)" 2.34 "Score (End)" 0 "Treatment: Option to Take" 1.5 "Treatment: Option to Receive Feedback") legend(off)
 	graph display, ysize(1) xsize(2)
 
-	**Updating legend tags
-	gr_edit legend.plotregion1.label[1].text = {}
-	gr_edit legend.plotregion1.label[1].text.Arrpush Want Feedback vs Option to Take
-	
-	gr_edit legend.plotregion1.label[2].text = {}
-	gr_edit legend.plotregion1.label[2].text.Arrpush Want Feedback - Level vs Option to Take
-	
-	gr_edit legend.plotregion1.label[3].text = {}
-	gr_edit legend.plotregion1.label[3].text.Arrpush Score Change vs Option to Take
-	
-	gr_edit legend.plotregion1.label[4].text = {}
-	gr_edit legend.plotregion1.label[4].text.Arrpush Score Change (End) vs Option to Take
-	
-	gr_edit legend.plotregion1.label[5].text = {}
-	gr_edit legend.plotregion1.label[5].text.Arrpush Score Change vs Option to Receive Feedback
-	
-	gr_edit legend.plotregion1.label[6].text = {}
-	gr_edit legend.plotregion1.label[6].text.Arrpush Score Change (End) vs Option to Receive Feedback
- 
+    **1st and 2nd rand level interaction plots
+	coefplot var1_r12_2 var2_r12_2 var3_r12_2 var4_r12_2   , keep(iat_option_take_or_not iat_feedback_option_or_not iat_interaction) ///
+ 	xline(0) title("IAT treatments and outcomes - interaction effects") xtitle("Point Estimates with 95% CIs (Standardized outcomes)", size(small)) ///
+ 	xlabel(-1.0(1)1.0) xscale(range(-1.0(1)1.0)) mlabel format(%9.3f) mlabposition(12) mlabgap(*1) level(95) ///
+ 	ylabel(0.1 "Treatment: Option to Take" 0.62 "Want Feedback (End)" 0.84 "Want Feedback - Level (End)" 1.06 "Score Change" 1.28 "Score (End)" 1.5 "Treatment: Option to Receive Feedback"  2.05 "Score Change (End)" 2.27 "Score (End)"  2.5 "Treatment: IAT and Feedback Options" 3.05 "Score Change (End)" 3.27 "Score (End)", labsize(small) ) ///
+ 	legend(off) 
