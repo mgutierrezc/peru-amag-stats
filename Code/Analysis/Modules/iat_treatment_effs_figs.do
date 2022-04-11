@@ -147,3 +147,5 @@ Programmer: Marco Gutierrez
  	xlabel(-1.0(1)1.0) xscale(range(-1.0(1)1.0)) mlabel format(%9.3f) mlabposition(12) mlabgap(*1) level(95) ///
  	ylabel(0.1 "Treatment: Option to Take" 0.62 "Want Feedback (End)" 0.84 "Want Feedback - Level" 1.06 "Score Change" 1.28 "Score (End)" 1.5 "Treatment: Option to Receive Feedback"  2.05 "Score Change" 2.27 "Score (End)"  2.5 "Treatment: IAT and Feedback Options" 3.05 "Score Change" 3.27 "Score (End)", labsize(small) ) ///
  	legend(off) 
+	
+	
