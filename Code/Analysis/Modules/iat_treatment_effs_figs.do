@@ -7,6 +7,14 @@ Programmer: Marco Gutierrez
 ***********/
 
 	/*-----
+	Setting up scheme
+	-----*/
+	
+	*ssc install blindschemes // uncomment for package install
+	set scheme plotplain // setting up scheme
+	
+
+	/*-----
 	Selection on observables for takeup
 	
 	---
@@ -85,19 +93,57 @@ Programmer: Marco Gutierrez
 	
 	
 	/*---
+	Density plots for IAT Scores
+	---*/
+	
+	**Baseline IAT Score distribution
+	preserve
+		keep if iat_score_change !=. // keeping only people who participated on both base and endline
+		sum bs_iat_score
+		
+		kdensity bs_iat_score if iat_option_take_or_not == 0, addplot(kdensity bs_iat_score if iat_option_take_or_not == 1,  recast(line) lpattern(dash)) ///
+		legend(order(1 "Compulsory IAT participation" 2 "Optional IAT participation") size(small)) ///
+		title("Distribution of IAT scores (Baseline)", size (medsmall))  ///
+		note("")
+	
+	graph export "$graphs/density_bsiat.png", replace
+	restore
+
+	**Endline IAT Score distribution
+	preserve
+		keep if iat_score_change !=.
+
+		sum en_iat_score
+
+		kdensity en_iat_score if iat_option_take_or_not == 0, addplot(kdensity en_iat_score if iat_option_take_or_not == 1,  recast(line) lpattern(dash)) ///
+		legend(order(1 "Compulsory IAT participation" 2 "Optional IAT participation") size(small)) ///
+		title("Distribution of IAT scores (Endline)", size (medsmall))  ///
+		note("")
+
+		graph export "$graphs/density_eniat.png", replace
+	restore
+	
+	**IAT Score Change distribution
+	kdensity iat_score_change if iat_option_take_or_not == 0, addplot(kdensity iat_score_change if iat_option_take_or_not == 1,  recast(line) lpattern(dash)) ///
+	legend(order(1 "Compulsory IAT participation" 2 "Optional IAT participation") size(small)) ///
+	title("Distribution of IAT Score Change", size (medsmall))  ///
+	note("")
+	
+	graph export "$graphs/density_scorechange_iat.png", replace
+	
+	
+	/*---
 	Plot generation for IAT Randomization 
 	regressions
 	---*/
-	
-	 set scheme plotplain // setting up scheme
-	
+		
 	**1st and 2nd rand level plots (plotting only reg coeffs from regs with ctrls)
-	coefplot var1_r1_2 var2_r1_2 var3_r1_2 var4_r1_2 var1_r2_2 var2_r2_2 , keep(iat_option_take_or_not iat_feedback_option_or_not) xline(0) title("IAT treatments and outcomes") xtitle("Point Estimates with 95% CIs (Standardized outcomes)") xlabel(-1.0(1)1.0) xscale(range(-1.0(1)1.0)) mlabel format(%9.3f) mlabposition(12) mlabgap(*1) level(95) ylabel(0.62 "Want Feedback (End)" 0.78 "Want Feedback - Level (End)" 0.96 "Score Change" 1.08 "Score (End)" 2.21 "Score Change (End)" 2.34 "Score (End)" 0 "Treatment: Option to Take" 1.5 "Treatment: Option to Receive Feedback") legend(off)
+	coefplot var1_r1_2 var2_r1_2 var3_r1_2 var4_r1_2 var1_r2_2 var2_r2_2 , keep(iat_option_take_or_not iat_feedback_option_or_not) xline(0) title("IAT treatments and outcomes") xtitle("Point Estimates with 95% CIs (Standardized outcomes)") xlabel(-1.0(1)1.0) xscale(range(-1.0(1)1.0)) mlabel format(%9.3f) mlabposition(12) mlabgap(*1) level(95) ylabel(0.62 "Want Feedback (End)" 0.78 "Want Feedback - Level (End)" 0.96 "Score Change" 1.08 "Score (End)" 2.21 "Score Change" 2.34 "Score (End)" 0 "Treatment: Option to Take" 1.5 "Treatment: Option to Receive Feedback") legend(off)
 	graph display, ysize(1) xsize(2)
 
     **1st and 2nd rand level interaction plots
 	coefplot var1_r12_2 var2_r12_2 var3_r12_2 var4_r12_2   , keep(iat_option_take_or_not iat_feedback_option_or_not iat_interaction) ///
  	xline(0) title("IAT treatments and outcomes - interaction effects") xtitle("Point Estimates with 95% CIs (Standardized outcomes)", size(small)) ///
  	xlabel(-1.0(1)1.0) xscale(range(-1.0(1)1.0)) mlabel format(%9.3f) mlabposition(12) mlabgap(*1) level(95) ///
- 	ylabel(0.1 "Treatment: Option to Take" 0.62 "Want Feedback (End)" 0.84 "Want Feedback - Level (End)" 1.06 "Score Change" 1.28 "Score (End)" 1.5 "Treatment: Option to Receive Feedback"  2.05 "Score Change (End)" 2.27 "Score (End)"  2.5 "Treatment: IAT and Feedback Options" 3.05 "Score Change (End)" 3.27 "Score (End)", labsize(small) ) ///
+ 	ylabel(0.1 "Treatment: Option to Take" 0.62 "Want Feedback (End)" 0.84 "Want Feedback - Level" 1.06 "Score Change" 1.28 "Score (End)" 1.5 "Treatment: Option to Receive Feedback"  2.05 "Score Change" 2.27 "Score (End)"  2.5 "Treatment: IAT and Feedback Options" 3.05 "Score Change" 3.27 "Score (End)", labsize(small) ) ///
  	legend(off) 

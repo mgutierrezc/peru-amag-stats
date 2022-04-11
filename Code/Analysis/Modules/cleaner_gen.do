@@ -218,6 +218,9 @@ subsections other controls are added
 	lab var z_en_iat_feedback_level "Player's feedback level"
 	lab var iat_option_take_or_not "Option to Take IAT"
 	lab var iat_feedback_option_or_not "Option to Receive Feedback"
+	label var bs_iat_score "IAT Score (Baseline)"
+	label var en_iat_score "IAT Score (Endline)"
+	label var iat_score_change "IAT Score Change"
 	
 	*Selection on observables for feedback
 	gen en_ignore_feedback = 0 if en_iat_want_feedback!=.
