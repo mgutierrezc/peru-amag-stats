@@ -72,6 +72,13 @@ Trolley
 	do "$modules\trolley_regs.do"
 
 
+/*=====
+Book Choices 
+=====*/
+
+	do "$modules\book_regs.do"
+	
+	
 e
 // *****************************************************
 // *Altruism and Redistribution 
