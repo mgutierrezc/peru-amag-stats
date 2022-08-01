@@ -19,11 +19,18 @@ Stats and plots
 	*ssc install blindschemes
 	set scheme plotplain
 
-	*Feedback level (baseline)
-	sum bs_iat_feedback_level
-	hist bs_iat_feedback_level
+	*Filtering for all participants in both bs and end
+	preserve
 	
-	*Feedback level (endline)
-	sum en_iat_feedback_level
-	hist en_iat_feedback_level
+		*applying filter
+		keep if bs_iat_feedback_level != . & en_iat_feedback_level != .
+		
+		*Feedback level (baseline)
+		sum bs_iat_feedback_level
+		hist bs_iat_feedback_level
+		
+		*Feedback level (endline)
+		sum en_iat_feedback_level
+		hist en_iat_feedback_level
 	
+	restore
