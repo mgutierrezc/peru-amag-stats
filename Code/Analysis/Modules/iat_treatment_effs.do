@@ -44,13 +44,20 @@ Programmer: Marco Gutierrez
 			} 
 		else{ // storing reg output in outreg file
 			outreg2 using "$tables\iat_option_take_or_not.xls", append stats(coef pval ) level(95) addtext("Controls", "No", "Mean of dep var. ctrl.", `mean') label keep(iat_option_take_or_not) nocons nor2
-		}
+		} 
 		
 		qui sum `y' if iat_option_take_or_not==0 & !missing($controls_miss), d // mean y control group
 		local mean = round(`r(mean)', 0.001) 
 		qui:reg `y' iat_option_take_or_not $controls, vce(cluster Course) // regression with controls
 		outreg2 using "$tables\iat_option_take_or_not.xls", append stats(coef pval ) level(95) addtext("Controls", "Yes", "Mean of dep var. ctrl.", `mean') label keep(iat_option_take_or_not) nocons nor2 // storing r
 		local reg_counter = `reg_counter' + 1
+	}
+	
+	/*----
+	--Lee bounds--
+	----*/
+	foreach y in $iat_outcomes {
+		leebounds `y' iat_option_take_or_not
 	}
 	
 	
@@ -80,6 +87,13 @@ Programmer: Marco Gutierrez
 		local reg_counter = `reg_counter' + 1
 	}
 	
+	/*----
+	--Lee bounds--
+	----*/
+	foreach y in $iat_outcomes_nf {
+		leebounds `y' iat_feedback_option_or_not
+	}
+	
 	
 	/*---
 	Randomization 1st and 2nd level: Interaction of Option to take IAT
@@ -106,4 +120,10 @@ Programmer: Marco Gutierrez
 		local reg_counter = `reg_counter' + 1
 	}
 	
+	/*----
+	--Lee bounds--
+	----*/
+	foreach y in $iat_outcomes {
+		leebounds `y' iat_interaction
+	}
 	
