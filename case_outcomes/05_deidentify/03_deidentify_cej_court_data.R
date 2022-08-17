@@ -377,7 +377,7 @@ documents_amag <- documents_amag %>%
   left_join(project_case_id, by = c("expediente_n", "nrodocumento")) %>%
   ungroup() %>%
   select(
-    -expediente_n, -nrodocumento, -link,
+    -expediente_n, -link,
     -fecha_de_resolucion_ingreso, -hour, -resolucion,
     -tipo_de_notificacion, -acto, -fojas_folios,
     -proveido, -sumilla, -descripcion_de_usuario,
