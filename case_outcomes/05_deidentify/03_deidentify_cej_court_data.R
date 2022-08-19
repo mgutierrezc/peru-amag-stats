@@ -10,11 +10,11 @@ files <- list.files(
 
 # Select files to load
 files_reportes <- files[str_detect(files, "file_report")]
-files_reportes <- files_reportes[!str_detect(files_reportes, "2017")]
+files_reportes <- files_reportes[str_detect(files_reportes, "2021")]
 files_follow_up <- files[str_detect(files, "follow_up")]
-files_follow_up <- files_follow_up[!str_detect(files_follow_up, "2017")]
+files_follow_up <- files_follow_up[str_detect(files_follow_up, "2021")]
 files_procedural_parts <- files[str_detect(files, "procedural_parts")]
-files_procedural_parts <- files_procedural_parts[!str_detect(files_procedural_parts, "2017")]
+files_procedural_parts <- files_procedural_parts[str_detect(files_procedural_parts, "2021")]
 files_downloads <- files[str_detect(files, "DOWNLOADS")]
 
 # Load datasets
