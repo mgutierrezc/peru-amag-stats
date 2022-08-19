@@ -577,38 +577,38 @@ masterdata_case_id <- masterdata_participant %>%
 
 # Save master dataset - participant level
 write_csv(masterdata_participant,
-  paste0(data_amag_raw, "raw_data/", "00_research_design/",
-  "01_master_datasets/master_dataset_participant_identified.csv"))
+  paste0(local_storage,
+  "master_dataset_participant_identified.csv"))
 
 # Save master dataset - participant-round level
 write_csv(masterdata_participant_round,
-  paste0(data_amag_raw, "raw_data/", "00_research_design/",
-  "01_master_datasets/master_dataset_participant_round_identified.csv"))
+  paste0(local_storage,
+  "master_dataset_participant_round_identified.csv"))
 
 # Save master dataset - case id.
 write_csv(masterdata_case_id,
-  paste0(data_amag_raw, "raw_data/", "00_research_design/",
-  "01_master_datasets/master_dataset_case_id_identified.csv"))
+  paste0(local_storage,
+  "master_dataset_case_id_identified.csv"))
 
 ## Save project id datasets
 
 # Save master dataset - participant level
 masterdata_participant %>%
   select(nrodocumento, participant_id) %>%
-  write_csv(paste0(data_amag_raw, "raw_data/", "00_research_design/",
-    "02_project_ids/master_dataset_participant.csv"))
+  write_csv(paste0(local_storage,
+    "master_dataset_participant.csv"))
 
 # Save master dataset - participant-round level
 masterdata_participant_round %>%
   select(nrodocumento, participant_id, round) %>%
-  write_csv(paste0(data_amag_raw, "raw_data/", "00_research_design/",
-    "02_project_ids/master_dataset_participant_round.csv"))
+  write_csv(paste0(local_storage,
+    "master_dataset_participant_round.csv"))
 
 # Save master dataset - case id.
 masterdata_case_id %>%
   select(nrodocumento, participant_id, expediente_n, case_id) %>%
-  write_csv(paste0(data_amag_raw, "raw_data/", "00_research_design/",
-    "02_project_ids/master_dataset_case_id.csv"))
+  write_csv(paste0(local_storage,
+    "master_dataset_case_id.csv"))
 
 ## Save de-identified master datasets
 
@@ -634,7 +634,7 @@ masterdata_participant %>%
     treated_60,
     ratio_teacher_female,
     ratio_female_monit) %>%
-  write_csv(paste0(data_amag_raw, "raw_deidentified/", "00_research_design/",
+  write_csv(paste0(local_storage,
     "master_dataset_participant.csv"))
 
 # Save master dataset - participant-round level
@@ -658,7 +658,7 @@ masterdata_participant_round %>%
     monitoreo,
     teacher_female,
     monitor_female) %>%
-  write_csv(paste0(data_amag_raw, "raw_deidentified/", "00_research_design/",
+  write_csv(paste0(local_storage,
     "master_dataset_participant_round.csv"))
 
 # Save master dataset - case id.
@@ -684,5 +684,5 @@ masterdata_case_id %>%
     treated_60,
     ratio_teacher_female,
     ratio_female_monit) %>%
-  write_csv(paste0(data_amag_raw, "raw_deidentified/", "00_research_design/",
+  write_csv(paste0(local_storage,
     "master_dataset_case_id.csv"))
