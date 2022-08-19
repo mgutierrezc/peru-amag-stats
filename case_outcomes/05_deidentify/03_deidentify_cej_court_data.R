@@ -78,8 +78,7 @@ write_csv(paste0(
 
 # Downloads
 downloads_amag <- read_csv(
-  paste0(data_amag_raw,
-  "raw_data/", "04_cej_court/", "downloads_amag_raw.csv")) %>%
+  paste0(local_storage, "downloads_amag_raw.csv")) %>%
   mutate(
     # Remove extra white space and lower text
     text = str_squish(tolower(text)),
@@ -88,8 +87,7 @@ downloads_amag <- read_csv(
 
 # Follow_up
 follow_up_amag <- read_csv(
-  paste0(data_amag_raw,
-  "raw_data/", "04_cej_court/", "follow_up_amag_raw.csv")) %>%
+  paste0(local_storage, "follow_up_amag_raw.csv")) %>%
   # Create vars that identify resolution date and hour
   separate(fecha_de_resolucion_ingreso, c("date", "hour"),
     remove = FALSE,
@@ -304,8 +302,7 @@ filter(acto != "nota") %>%
 # Preprocess reportes --------------------------------------------
 
 reportes_amag <- read_csv(
-  paste0(data_amag_raw,
-  "raw_data/", "04_cej_court/", "reportes_amag_raw.csv")) %>%
+  paste0(local_storage, "reportes_amag_raw.csv")) %>%
   select(
     expediente_n, distrito_judicial, proceso,
     especialidad, estado, etapa_procesal)
@@ -314,8 +311,7 @@ reportes_amag <- read_csv(
 
 # Match gender dataset with procedural parts (first name)
 procedural_parts_amag <- read_csv(
-  paste0(data_amag_raw,
-  "raw_data/", "04_cej_court/", "procedural_parts_amag_raw.csv")) %>%
+  paste0(local_storage, "procedural_parts_amag_raw.csv")) %>%
   mutate(
   # Create parties variable
     parties = case_when(
