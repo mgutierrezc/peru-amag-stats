@@ -23,7 +23,7 @@ table07_monitoring_two_arms <- 1 # Creates monit table by monitor gener
 
 # User path -----------------------------------------------------------------
 
-# Brandon's data and github path
+# Brendon's data
 if (Sys.getenv("USER") == "") {
   data_path <- "/Users/brend/Dropbox (Daniel Chen)/"
   Sys.setenv(RSTUDIO_PANDOC = "/Applications/RStudio.app/Contents/MacOS/quarto/bin")
@@ -39,6 +39,8 @@ output_paper <- paste0(data_amag, "06_Outputs/01_Monitoring/")
 data_amag_raw <- paste0(data_amag, "02_Raw/master_monit/")
 data_amag_int <- paste0(data_amag, "03_Intermediate/master_monit/")
 data_amag_fin <- paste0(data_amag, "04_Final/master_monit/")
+
+local_storage <- "/Users/brend/OneDrive/Documents/World Bank/AMAG/Repo Refactoring/"
 
 # Packages used --------------------------------------------------------------
 packages <- c(
