@@ -24,9 +24,8 @@ table07_monitoring_two_arms <- 1 # Creates monit table by monitor gener
 # User path -----------------------------------------------------------------
 
 # Brandon's data and github path
-if (Sys.getenv("USER") == "brandonmora") {
-  data_path <- "/Users/brandonmora/Dropbox/Peru_Justice/02_Data/"
-  github_path <- "/Users/brandonmora/GitHub/peru-legal-aid/02_Data/01_AMAG/05_Code/01_master_monit/"
+if (Sys.getenv("USER") == "") {
+  data_path <- "/Users/brend/Dropbox (Daniel Chen)/"
   Sys.setenv(RSTUDIO_PANDOC = "/Applications/RStudio.app/Contents/MacOS/quarto/bin")
 }
 
@@ -66,48 +65,3 @@ sapply(packages, function(x) {
   
 # Load packages
 invisible(sapply(packages, require, character.only = TRUE))
-
-# Actions ---------------------------------------------------------------
-
-# Cleaning
-
-if (clean_satisfaction_data) source(
-  paste0(github_path, "code/01_clean/", "01_clean_satisfaction_data.R"))
-
-if (clean_grade_data) source(
-  paste0(github_path, "code/01_clean/", "02_clean_grade_data.R"))
-
-if (clean_iat_data) source(
-  paste0(github_path, "code/01_clean/", "03_clean_iat_data.R"))
-
-if (clean_case_outcomes) source(
-  paste0(github_path, "code/01_clean/", "04_clean_case_outcomes.R"))
-
-if (clean_logs_blackboard) source(
-  paste0(github_path, "code/01_clean/", "05_clean_logs_blackboard.R"))
-
-# Construct
-if (construct_dataset_monit) source(
-  paste0(github_path, "code/02_construct_datasets.R"))
-
-# Output for paper
-if (table01_balance) source(
-  paste0(github_path, "code/03_outputs/tables/", "table01_balance.R"))
-
-if (table02_grades_satisfaction) source(
-  paste0(github_path, "code/03_outputs/tables/", "table02_grades_satisfaction.R"))
-
-if (table03_iat_scores) source(
-  paste0(github_path, "code/03_outputs/tables/", "table03_iat_scores.R"))
-
-if (table04_case_outcomes) source(
-  paste0(github_path, "code/03_outputs/tables/", "table04_case_outcomes.R"))
-
-if (table05_satisfaction_feedback) source(
-  paste0(github_path, "code/03_outputs/tables/", "table05_satisfaction_feedback.R"))
-
-if (table06_monitoring_gender) source(
-  paste0(github_path, "code/03_outputs/tables/", "table06_monitoring_gender.R"))
-
-if (table07_monitoring_two_arms) source(
-  paste0(github_path, "code/03_outputs/tables/", "table07_monitoring_two_arms.R"))
