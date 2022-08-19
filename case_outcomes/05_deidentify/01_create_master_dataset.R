@@ -58,7 +58,7 @@ files <- list.files(
 
 ## Select reporte files
 files_reportes <- files[str_detect(files, "file_report")]
-files_reportes <- files_reportes[!str_detect(files_reportes, "2017")]
+files_reportes <- files_reportes[!str_detect(files_reportes, "2021")]
 
 ## Load datasets
 reportes <- lapply(
