@@ -40,14 +40,14 @@ downloads <- lapply(
 
 # Load cases master dataset
 md_case_id <- read_csv(paste0(
-  data_amag_raw, "raw_data/", "00_research_design/",
-  "01_master_datasets/master_dataset_case_id_identified.csv")) %>%
+  local_storage,
+  "master_dataset_case_id_identified.csv")) %>%
   select(expediente_n, nrodocumento)
 
 # Load project id dataset
 project_case_id <- read_csv(paste0(
-  data_amag_raw, "raw_data/", "00_research_design/",
-  "02_project_ids/master_dataset_case_id.csv"))
+  local_storage, 
+  "master_dataset_case_id.csv"))
 
 # Load gender dataset
 gender_dataset <- read_csv(paste0(
@@ -57,22 +57,22 @@ gender_dataset <- read_csv(paste0(
 md_case_id %>%
   inner_join(reportes) %>%
 write_csv(paste0(
-  data_amag_raw, "raw_data/", "04_cej_court/", "reportes_amag_raw.csv"))
+  local_storage, "reportes_amag_raw.csv"))
 
 md_case_id %>%
   inner_join(follow_up) %>%
 write_csv(paste0(
-  data_amag_raw, "raw_data/", "04_cej_court/", "follow_up_amag_raw.csv"))
+  local_storage, "follow_up_amag_raw.csv"))
 
 md_case_id %>%
   inner_join(procedural_parts) %>%
 write_csv(paste0(
-  data_amag_raw, "raw_data/", "04_cej_court/", "procedural_parts_amag_raw.csv"))
+  local_storage, "procedural_parts_amag_raw.csv"))
 
 md_case_id %>%
   inner_join(downloads, by = c("expediente_n" = "expediente_num")) %>%
 write_csv(paste0(
-  data_amag_raw, "raw_data/", "04_cej_court/", "downloads_amag_raw.csv"))
+  local_storage, "downloads_amag_raw.csv"))
 
 # Preprocess and clean datasets -------------------------------
 
@@ -399,13 +399,10 @@ procedural_parts_amag <- procedural_parts_amag %>%
 
 # Save datasets
 write_csv(documents_amag,
-  paste0(data_amag_raw, "raw_deidentified/",
-    "04_cej_court", "/documents_amag.csv"))
+  paste0(local_storage, "documents_amag.csv"))
 
 write_csv(reportes_amag,
-  paste0(data_amag_raw, "raw_deidentified/",
-    "04_cej_court", "/reportes_amag.csv"))
+  paste0(local_storage, "reportes_amag.csv"))
 
 write_csv(procedural_parts_amag,
-  paste0(data_amag_raw, "raw_deidentified/",
-    "04_cej_court", "/procedural_parts_amag.csv"))
+  paste0(local_storage, "procedural_parts_amag.csv"))
