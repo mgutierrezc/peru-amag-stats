@@ -1,15 +1,12 @@
 # Load datasets ----
 documents_amag_clean <- read_csv(
-  paste0(data_amag_raw, "raw_deidentified/",
-    "04_cej_court/", "documents_amag.csv"))
+  paste0(local_storage, "documents_amag.csv"))
 
 reportes_amag_clean <- read_csv(
-  paste0(data_amag_raw, "raw_deidentified/",
-    "04_cej_court/", "reportes_amag.csv"))
+  paste0(local_storage, "reportes_amag.csv"))
 
 procedural_parts_amag_clean <- read_csv(
-  paste0(data_amag_raw, "raw_deidentified/",
-    "04_cej_court/", "procedural_parts_amag.csv"))
+  paste0(local_storage, "procedural_parts_amag.csv"))
 
 # Create case outcomes ----
 
@@ -276,4 +273,4 @@ case_outcomes <- case_outcomes %>%
 # Save datasets ----
 
 write_csv(case_outcomes, paste0(
-  data_amag_int, "05_case_outcomes/case_outcomes.csv"))
+  local_storage, "case_outcomes.csv"))
