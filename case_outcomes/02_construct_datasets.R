@@ -7,17 +7,17 @@ source(paste0(github_path, "utils/utils_standardize_outcomes.R"))
 
 # Load master dataset (participant level)
 masterdata_participant <- read_csv(paste0(
-  data_amag_raw, "raw_deidentified/", "00_research_design/",
+  local_storage,
   "master_dataset_participant.csv"))
 
 # Load master dataset (participant-round level)
 masterdata_participant_round <- read_csv(paste0(
-  data_amag_raw, "raw_deidentified/", "00_research_design/",
+  local_storage,
   "master_dataset_participant_round.csv"))
 
 # Load master dataset (case-id level)
 masterdata_case_id <- read_csv(paste0(
-  data_amag_raw, "raw_deidentified/", "00_research_design/",
+  local_storage,
   "master_dataset_case_id.csv"))
 
 # Load IAT data (participant level)
@@ -226,22 +226,22 @@ days_to_res_judges <- days_to_res_data_post %>% select(participant_id) %>% uniqu
 # Save analysis datasets ----
 
 write_csv(data_participant,
-  paste0(data_amag_fin, "00_analysis/dataset_participant.csv"))
+  paste0(local_storage, "dataset_participant.csv"))
 
 write_csv(data_participant_round,
-  paste0(data_amag_fin, "00_analysis/dataset_participant_round.csv"))
+  paste0(local_storage, "dataset_participant_round.csv"))
 
 write_csv(data_participant_round_meeting,
-  paste0(data_amag_fin, "00_analysis/dataset_participant_round_meeting.csv"))
+  paste0(local_storage, "dataset_participant_round_meeting.csv"))
 
 write_csv(data_participant_caseid,
-  paste0(data_amag_fin, "00_analysis/dataset_participant_caseid.csv"))
+  paste0(local_storage, "dataset_participant_caseid.csv"))
 
 write_csv(fundada_appeal_data_post,
-  paste0(data_amag_fin, "00_analysis/dataset_caseid_month_fundada_post.csv"))
+  paste0(local_storage, "dataset_caseid_month_fundada_post.csv"))
 
 write_csv(resolution_data_post,
-  paste0(data_amag_fin, "00_analysis/dataset_caseid_month_resolution_post.csv"))
+  paste0(local_storage, "dataset_caseid_month_resolution_post.csv"))
 
 write_csv(days_to_res_data_post,
-  paste0(data_amag_fin, "00_analysis/dataset_caseid_month_days_to_res_post.csv"))
+  paste0(local_storage, "dataset_caseid_month_days_to_res_post.csv"))

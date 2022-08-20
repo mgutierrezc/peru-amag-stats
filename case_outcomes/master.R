@@ -26,6 +26,7 @@ table07_monitoring_two_arms <- 1 # Creates monit table by monitor gener
 # Brendon's data
 if (Sys.getenv("USER") == "") {
   data_path <- "/Users/brend/Dropbox (Daniel Chen)/"
+  github_path <- "/Users/brandonmora/GitHub/peru-legal-aid/02_Data/01_AMAG/05_Code/01_master_monit/"
   Sys.setenv(RSTUDIO_PANDOC = "/Applications/RStudio.app/Contents/MacOS/quarto/bin")
 }
 
