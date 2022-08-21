@@ -168,7 +168,7 @@ fundada_appeal_var <- data_participant_caseid %>%
     var_uncon_reversal = mean(var_uncon_reversal, na.rm = TRUE),
     var_appeal = mean(var_appeal, na.rm = TRUE)) %>%
   rename(month_year = month_year_sentence)  %>%
-  filter(month_year > '2020-12-01') %>%
+  filter(month_year > '2021-06-01') %>%
   ungroup()
 
 resolution_var <- data_participant_caseid %>%
@@ -177,7 +177,7 @@ resolution_var <- data_participant_caseid %>%
     percent_monit = first(percent_monit),
     var_resolution = mean(var_resolution, na.rm = TRUE)) %>%
   rename(month_year = month_year_first_auto) %>%
-  filter(month_year > '2020-12-01') %>%
+  filter(month_year > '2021-06-01') %>%
   ungroup() %>%
   # Standardize outcome
   std_outcome(var_resolution, var_resolution_std, percent_monit)
@@ -189,7 +189,7 @@ days_to_res_var <- data_participant_caseid %>%
     var_timely_resolved = mean(timely_resolved, na.rm = TRUE),
     length_auto_resolution = mean(length_auto_resolution, na.rm = TRUE)) %>%
   rename(month_year = month_year_resolution) %>%
-  filter(month_year > '2020-12-01') %>%
+  filter(month_year > '2021-06-01') %>%
   ungroup() %>%
   # Standardize outcome
   std_outcome(var_timely_resolved, var_timely_resolved_std, percent_monit) %>%
