@@ -485,7 +485,7 @@ masterdata_participant_round <- masterdata_participant %>%
 masterdata_case_id <- masterdata_participant %>%
   select(nrodocumento, participant_id) %>%
   inner_join(masterdata_case_id, by = "nrodocumento") %>%
-  arrange(nrodocumento, expediente_n) %>%
+  arrange(nrodocumento) %>%
   rowid_to_column("case_id")
 
 
@@ -524,7 +524,7 @@ masterdata_participant_round %>%
 
 # Save master dataset - case id.
 masterdata_case_id %>%
-  select(nrodocumento, participant_id, expediente_n, case_id) %>%
+  select(nrodocumento, participant_id, case_id) %>%
   write_csv(paste0(local_storage,
     "master_dataset_case_id.csv"))
 
