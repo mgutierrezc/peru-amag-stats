@@ -21,6 +21,7 @@ library(multiwayvcov) # Generate robust standard
 library(sandwich) # Generate robust standard errors
 library(stargazer) # Good way to report regression reports
 library(haven) # Package used to load DTA files
+library(readr) # Package use to load CSV files
 ```
 
 # Data Import
@@ -55,12 +56,12 @@ df_subset <- df %>%
 # Create DF Output
 ```{r}
 # Save as a dataframe
-master_dataset_case_id <- as.data.frame(df_subset)
+judges_list <- as.data.frame(df_subset)
 
 # Create CSV output 
-write.csv(x=master_dataset_case_id, file="master_dataset_case_id_identified.csv")
+write.csv(x=judges_list, file="amag_ii_judges_list.csv", row.names=FALSE)
 
 # Inspect to ensure encoding is accurate
-df_review <- read_csv('master_dataset_case_id_identified.csv')
+df_review <- read_csv('amag_ii_judges_list.csv')
 ```
 
