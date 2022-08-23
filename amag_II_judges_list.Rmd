@@ -20,11 +20,47 @@ library(lmtest) # Run linear regressions with robust standard errors
 library(multiwayvcov) # Generate robust standard 
 library(sandwich) # Generate robust standard errors
 library(stargazer) # Good way to report regression reports
-library(foreign) # Package used to load DTA files
+library(haven) # Package used to load DTA files
 ```
 
 # Data Import
 ```{r, message=FALSE, warning=FALSE}
 setwd("C:/Users/brend/OneDrive/Documents/GitHub/peru-amag-stats")
-df <- read.dta("Clean_Full_Data12.dta")
+df <- read_dta("Clean_Full_Data12.dta")
 ```
+
+# Data Cleaning 
+```{r}
+df <- df %>%
+# Drop NA values for names
+    drop_na(Nombres, ApellidoPaterno, ApellidoMaterno) %>%
+    mutate(
+# Create single column for judge names
+    juez = paste(Nombres, ApellidoPaterno, ApellidoMaterno, sep=' '),
+# Remove whitespace
+    juez = str_squish(juez)
+)
+
+# Subset DF to create list of Judges Names and DNI Numbers
+df_subset <- df %>%
+  select(c('DNI', 'juez')) %>%
+# Drop duplicate observations 
+  distinct() %>%
+# Remove NA values for DNI
+  drop_na(DNI) %>%
+# Rename column name to match Peru Amag I 
+  rename(nrodocumento = DNI)
+```
+
+# Create DF Output
+```{r}
+# Save as a dataframe
+master_dataset_case_id <- as.data.frame(df_subset)
+
+# Create CSV output 
+write.csv(x=master_dataset_case_id, file="master_dataset_case_id_identified.csv")
+
+# Inspect to ensure encoding is accurate
+df_review <- read_csv('master_dataset_case_id_identified.csv')
+```
+
