@@ -18,7 +18,7 @@ masterdata_participant_round <- read_csv(paste0(
 # Load master dataset (case-id level)
 masterdata_case_id <- read_csv(paste0(
   local_storage,
-  "master_dataset_case_id.csv"))
+  "master_dataset_case_id_identified.csv"))
 
 # Load IAT data (participant level)
 iat_data <- read_csv(paste0(
