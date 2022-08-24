@@ -39,6 +39,11 @@ round_id <- list.files(paste0(data_amag_raw, "raw_data/", "06_matriculados"))
 round_id <- round_id[str_detect(round_id, "Matriculados_09.09", negate = T)]
 round_id <- round_id[str_detect(round_id, "Matriculados_14.10", negate = T)]
 
+# Load List of AMAG-II Judges
+amag_ii_judges <- read_csv(
+  paste0('C:/Users/brend/OneDrive/Documents/GitHub/peru-amag-stats/',
+  'amag_ii_judges_list.csv'))
+
 ## Read files
 participant_data <- lapply(
   paste0(data_amag_raw, "raw_data/", "06_matriculados/", round_id),
