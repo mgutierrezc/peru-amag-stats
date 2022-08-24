@@ -556,23 +556,6 @@ masterdata_case_id <- matched_judge_name %>%
   left_join(amag_ii_judges, by = "nrodocumento") %>%
   select(-'juez')
 
-# Create new identifiers for each person and case-id
-
-masterdata_participant <- masterdata_participant %>%
-  arrange(nrodocumento) %>%
-  rowid_to_column("participant_id")
-
-masterdata_participant_round <- masterdata_participant %>%
-  select(nrodocumento, participant_id) %>%
-  left_join(masterdata_participant_round, by = "nrodocumento")
-
-masterdata_case_id <- masterdata_participant %>%
-  select(nrodocumento, participant_id) %>%
-  inner_join(masterdata_case_id, by = "nrodocumento") %>%
-  arrange(nrodocumento, expediente_n) %>%
-  rowid_to_column("case_id")
-
-
 # Save datasets ----------------------------------------------------------
 
 ## Save raw datasets with identifying information and project id
