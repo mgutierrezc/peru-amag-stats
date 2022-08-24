@@ -518,33 +518,29 @@ multiple_judge_names <- judge_names %>%
 # Perform fuzzy join to match participants
 
 # Try apellido-nombre
-matched_judge_name1 <- masterdata_participant %>%
-  select(participant_apellido_nombre, nrodocumento) %>%
+matched_judge_name1 <- amag_ii_judges %>%
   stringdist_left_join(judge_names,
-    by = c("participant_apellido_nombre" = "juez"), "lv", 2) %>%
+    by = c("juez" = "juez"), "lv", 2) %>%
   filter(!is.na(juez)) %>%
   select(nrodocumento, juez) 
 
 # Try nombre-apellido
-matched_judge_name2 <- masterdata_participant %>%
-  select(participant_nombre_apellido, nrodocumento) %>%
+matched_judge_name2 <- amag_ii_judges %>%
   stringdist_left_join(judge_names, "lv", 2,
-    by = c("participant_nombre_apellido" = "juez")) %>%
+    by = c("juez" = "juez")) %>%
   filter(!is.na(juez)) %>%
   select(nrodocumento, juez)  
 
 # Try apellido nombre for multiple judges
-matched_judge_name3 <- masterdata_participant %>%
-  select(participant_nombre_apellido, nrodocumento) %>%
+matched_judge_name3 <- amag_ii_judges %>%
   stringdist_left_join(multiple_judge_names,
-    by = c("participant_nombre_apellido" = "juez3"), method = "lv", max_dist = 2) %>%
+    by = c("juez" = "juez3"), method = "lv", max_dist = 2) %>%
   filter(!is.na(juez))  %>%
   select(nrodocumento, juez)
 
-matched_judge_name4 <- masterdata_participant %>%
-  select(participant_apellido_nombre, nrodocumento) %>%
+matched_judge_name4 <- amag_ii_judges %>%
   stringdist_left_join(multiple_judge_names,
-    by = c("participant_apellido_nombre" = "juez3"), method = "lv", max_dist = 2) %>%
+    by = c("juez" = "juez3"), method = "lv", max_dist = 2) %>%
   filter(!is.na(juez)) %>%
   select(nrodocumento, juez)
 
