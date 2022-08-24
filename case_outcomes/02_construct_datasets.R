@@ -65,6 +65,9 @@ data_participant_round_meeting <- masterdata_participant_round %>%
 data_participant_caseid <- masterdata_case_id %>%
   inner_join(case_outcomes, by = c("case_id", "participant_id"))
 
+match(case_outcomes$participant_id, masterdata_case_id$participant_id)
+match(case_outcomes$case_id, masterdata_case_id$case_id)
+
 # ------------------------------------------------------------------
 
 # Construct variables ----
