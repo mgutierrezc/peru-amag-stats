@@ -517,18 +517,37 @@ matched_judge_name1 <- masterdata_participant %>%
   select(participant_apellido_nombre, nrodocumento) %>%
   stringdist_left_join(judge_names,
     by = c("participant_apellido_nombre" = "juez"), "lv", 2) %>%
-  filter(!is.na(juez)) 
+  filter(!is.na(juez)) %>%
+  select(nrodocumento, juez) 
 
 # Try nombre-apellido
 matched_judge_name2 <- masterdata_participant %>%
   select(participant_nombre_apellido, nrodocumento) %>%
   stringdist_left_join(judge_names, "lv", 2,
     by = c("participant_nombre_apellido" = "juez")) %>%
-  filter(!is.na(juez))  
+  filter(!is.na(juez)) %>%
+  select(nrodocumento, juez)  
+
+# Try apellido nombre for multiple judges
+matched_judge_name3 <- masterdata_participant %>%
+  select(participant_nombre_apellido, nrodocumento) %>%
+  stringdist_left_join(multiple_judge_names,
+    by = c("participant_nombre_apellido" = "juez3"), method = "lv", max_dist = 2) %>%
+  filter(!is.na(juez))  %>%
+  select(nrodocumento, juez)
+
+matched_judge_name4 <- masterdata_participant %>%
+  select(participant_apellido_nombre, nrodocumento) %>%
+  stringdist_left_join(multiple_judge_names,
+    by = c("participant_apellido_nombre" = "juez3"), method = "lv", max_dist = 2) %>%
+  filter(!is.na(juez)) %>%
+  select(nrodocumento, juez)
 
 # Join  datasets
 matched_judge_name <- matched_judge_name1 %>%
-  bind_rows(matched_judge_name2) 
+  bind_rows(matched_judge_name2) %>%
+  bind_rows(matched_judge_name3) %>%
+  bind_rows(matched_judge_name4) 
 
 # Create dataset with all cases managed by an AMAG-II Judges
 masterdata_case_id <- matched_judge_name %>%
@@ -548,7 +567,7 @@ masterdata_participant_round <- masterdata_participant %>%
 masterdata_case_id <- masterdata_participant %>%
   select(nrodocumento, participant_id) %>%
   inner_join(masterdata_case_id, by = "nrodocumento") %>%
-  arrange(nrodocumento) %>%
+  arrange(nrodocumento, expediente_n) %>%
   rowid_to_column("case_id")
 
 
