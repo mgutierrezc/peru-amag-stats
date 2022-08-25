@@ -7,9 +7,9 @@ source(paste0(github_path, "utils/utils_standardize_outcomes.R"))
 
 # Load master dataset (participant level)
 # this should be your list of AMAG-II participants
-masterdata_participant <- read_dta(paste0(
+masterdata_participant <- read_csv(paste0(
   local_storage,
-  "Clean_Full_Data12.dta"))
+  "amag_ii_judges_list.csv"))
 
 # Load master dataset (case-id level)
 # this should be your list of AMAG-II cases (output from 01_create_master_dataset)
