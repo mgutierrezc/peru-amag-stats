@@ -1,84 +1,17 @@
-## Script for creating CEJ datasets
+# Preprocess and clean datasets -------------------------------
 
-# Load raw data ---------------------------------------------------------
-
-# Get the file names
-files <- list.files(
-  path = paste0(data_cej, "data_cleaned/"),
-  pattern = "*.csv",
-  recursive = TRUE)
-
-# Select files to load
-files_reportes <- files[str_detect(files, "file_report")]
-files_reportes <- files_reportes[!str_detect(files_reportes, "2017")]
-files_follow_up <- files[str_detect(files, "follow_up")]
-files_follow_up <- files_follow_up[!str_detect(files_follow_up, "2017")]
-files_procedural_parts <- files[str_detect(files, "procedural_parts")]
-files_procedural_parts <- files_procedural_parts[!str_detect(files_procedural_parts, "2017")]
-files_downloads <- files[str_detect(files, "DOWNLOADS")]
-
-# Load datasets
-reportes <- lapply(
-  paste0(data_cej, "data_cleaned/", files_reportes), read_csv) %>%
-  bind_rows() %>%
-  clean_names()
-
-follow_up <- lapply(
-  paste0(data_cej, "data_cleaned/", files_follow_up), read_csv) %>%
-  bind_rows() %>%
-  clean_names()
-
-procedural_parts <- lapply(
-  paste0(data_cej, "data_cleaned/", files_procedural_parts), read_csv) %>%
-  bind_rows() %>%
-  clean_names()
-
-downloads <- lapply(
-  paste0(data_cej, "data_cleaned/", files_downloads), read_csv) %>%
-  bind_rows() %>%
-  clean_names()
-
-# Load cases master dataset
-md_case_id <- read_csv(paste0(
-  local_storage,
-  "master_dataset_case_id_identified.csv")) %>%
+# Load AMAG II cases dataset
+amag_ii_cases <- read_csv(file.path(
+  local_storage, "raw", "amag_ii_cases.csv")) %>%
   select(expediente_n, nrodocumento)
 
-# Load project id dataset
-project_case_id <- read_csv(paste0(
-  local_storage, 
-  "master_dataset_case_id.csv"))
-
-# Load gender dataset
-gender_dataset <- read_csv(paste0(
-  data_amag_raw, "raw_data/", "07_others/", "00_gender/harvard_set_gender.csv"))
-
-# Keep only AMAG-I cases and save raw datasets
-md_case_id %>%
-  inner_join(reportes) %>%
-write_csv(paste0(
-  local_storage, "reportes_amag_raw.csv"))
-
-md_case_id %>%
-  inner_join(follow_up) %>%
-write_csv(paste0(
-  local_storage, "follow_up_amag_raw.csv"))
-
-md_case_id %>%
-  inner_join(procedural_parts) %>%
-write_csv(paste0(
-  local_storage, "procedural_parts_amag_raw.csv"))
-
-md_case_id %>%
-  inner_join(downloads, by = c("expediente_n" = "expediente_num")) %>%
-write_csv(paste0(
-  local_storage, "downloads_amag_raw.csv"))
-
-# Preprocess and clean datasets -------------------------------
+# # Load gender dataset from AMAG-I
+gender_dataset <- read_csv(file.path(
+  data_amag_i, "02_raw", "master_monit", "raw_data", "07_others", "00_gender/harvard_set_gender.csv"))
 
 # Downloads
 downloads_amag <- read_csv(
-  paste0(local_storage, "downloads_amag_raw.csv")) %>%
+  file.path(local_storage, "raw", "downloads_amag_ii_raw.csv")) %>%
   mutate(
     # Remove extra white space and lower text
     text = str_squish(tolower(text)),
@@ -87,7 +20,7 @@ downloads_amag <- read_csv(
 
 # Follow_up
 follow_up_amag <- read_csv(
-  paste0(local_storage, "follow_up_amag_raw.csv")) %>%
+  file.path(local_storage, "raw", "follow_up_amag_ii_raw.csv")) %>%
   # Create vars that identify resolution date and hour
   separate(fecha_de_resolucion_ingreso, c("date", "hour"),
     remove = FALSE,
@@ -145,7 +78,7 @@ list_downloads_unique <- list_downloads_dupes %>%
   filter(is.na(dup2)) %>%
   select(expediente_n, id_dup)  %>%
   mutate(unique_id = 1)
-  
+
 # Split downloads in unique and dup link
 downloads_1 <- downloads_amag %>%
   filter(is.na(dup))
@@ -302,7 +235,7 @@ filter(acto != "nota") %>%
 # Preprocess reportes --------------------------------------------
 
 reportes_amag <- read_csv(
-  paste0(local_storage, "reportes_amag_raw.csv")) %>%
+  file.path(local_storage, "raw", "reportes_amag_ii_raw.csv")) %>%
   select(
     expediente_n, distrito_judicial, proceso,
     especialidad, estado, etapa_procesal)
@@ -311,7 +244,7 @@ reportes_amag <- read_csv(
 
 # Match gender dataset with procedural parts (first name)
 procedural_parts_amag <- read_csv(
-  paste0(local_storage, "procedural_parts_amag_raw.csv")) %>%
+  file.path(local_storage, "raw", "procedural_parts_amag_ii_raw.csv")) %>%
   mutate(
   # Create parties variable
     parties = case_when(
@@ -368,37 +301,12 @@ procedural_parts_amag <- procedural_parts_amag %>%
       "female_ratio", "legal_entity_ratio",
       "female_indicator", "legal_entity_indicator"))
 
-# De-identify datasets
-documents_amag <- documents_amag %>%
-  left_join(project_case_id, by = c("expediente_n", "nrodocumento")) %>%
-  ungroup() %>%
-  select(
-    -expediente_n, -link,
-    -fecha_de_resolucion_ingreso, -hour, -resolucion,
-    -tipo_de_notificacion, -acto, -fojas_folios,
-    -proveido, -sumilla, -descripcion_de_usuario,
-    -download, -num, -text,
-    -error, -id_dup, -dup,
-    -unique_id, -parte_resolutiva)
-
-reportes_amag <- reportes_amag %>%
-  left_join(project_case_id, by = "expediente_n") %>%
-  ungroup() %>%
-  select(
-    -expediente_n, -distrito_judicial, -estado,
-    -etapa_procesal, -nrodocumento)
-
-procedural_parts_amag <- procedural_parts_amag %>%
-  left_join(project_case_id, by = "expediente_n") %>%
-  ungroup() %>%
-  select(-expediente_n, -nrodocumento)
-
 # Save datasets
 write_csv(documents_amag,
-  paste0(local_storage, "documents_amag.csv"))
+  file.path(local_storage, "intermediate", "documents_amag_ii_clean.csv"))
 
 write_csv(reportes_amag,
-  paste0(local_storage, "reportes_amag.csv"))
+  file.path(local_storage, "intermediate", "reportes_amag_ii_clean.csv"))
 
 write_csv(procedural_parts_amag,
-  paste0(local_storage, "procedural_parts_amag.csv"))
+  file.path(local_storage, "intermediate", "procedural_parts_amag_ii_clean.csv"))

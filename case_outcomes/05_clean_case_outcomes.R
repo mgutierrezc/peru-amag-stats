@@ -1,18 +1,18 @@
 # Load datasets ----
 documents_amag_clean <- read_csv(
-  paste0(local_storage, "documents_amag.csv"))
+  file.path(local_storage, "intermediate", "documents_amag_ii_clean.csv"))
 
 reportes_amag_clean <- read_csv(
-  paste0(local_storage, "reportes_amag.csv"))
+  file.path(local_storage, "intermediate", "reportes_amag_ii_clean.csv"))
 
 procedural_parts_amag_clean <- read_csv(
-  paste0(local_storage, "procedural_parts_amag.csv"))
+  file.path(local_storage, "intermediate", "procedural_parts_amag_ii_clean.csv"))
 
 # Create case outcomes ----
 
 # Create fundada outcomes
 fundada_var <- documents_amag_clean %>%
-  group_by(case_id) %>%
+  group_by(expediente_n) %>%
   summarise(
     fundada = max(fundada, na.rm = TRUE),
     fundada_parte = max(fundada_parte, na.rm = TRUE),
@@ -23,11 +23,11 @@ fundada_var <- documents_amag_clean %>%
       fundada == 0 & infundada == 1 ~ 0,
       fundada_parte == 1 ~ 1,
       fundada == 1 & infundada == 1 ~ 1)) %>%
-  select(case_id, var_fundada)
+  select(expediente_n, var_fundada)
 
 # Identify resolutions
 resolution_var <- documents_amag_clean %>%
-  group_by(case_id) %>%
+  group_by(expediente_n) %>%
   summarise(
     vista2 = max(vista2, na.rm = TRUE),
     revoca2 = max(revoca2, na.rm = TRUE),
@@ -50,28 +50,28 @@ resolution_var <- documents_amag_clean %>%
     fundada == 1 |
     fundada_parte == 1 |
     infundada == 1, 1, 0)) %>%
-  select(case_id, var_resolution)
+  select(expediente_n, var_resolution)
 
 # Create appeal outcome
 appeal_var <- documents_amag_clean %>%
   separate(
-    case_id,
+    expediente_n,
     remove = FALSE,
     c("c1", "c2", "c3", "c4", "c5", "c6", "c7"), "-") %>%
   arrange(c2, c5, c6, c7, c4, c1, c3, date) %>%
   mutate(
     decision = if_else(fundada == 1 | fundada_parte == 1 | infundada == 1, 1, 0),
     decision_na = na_if(decision, 0)) %>%
-  group_by(case_id) %>%
+  group_by(expediente_n) %>%
   fill(decision_na, .direction = "down") %>%
   filter(!is.na(decision_na)) %>%
   summarise(var_appeal = max(appeal)) %>%
-  select(case_id, var_appeal)
+  select(expediente_n, var_appeal)
 
 # Create reversal outcome
 
 reversal_var <- documents_amag_clean %>%
-  group_by(case_id) %>%
+  group_by(expediente_n) %>%
   summarise(
     vista = max(vista, na.rm = TRUE),
     revoca = max(revoca, na.rm = TRUE),
@@ -83,13 +83,13 @@ reversal_var <- documents_amag_clean %>%
       revoca_nula == 1 & confirma == 1 ~ 1,
       revoca_nula == 0 & confirma == 1 ~ 0,
       revoca_nula == 1 & confirma == 0 ~ 1)) %>%
-  left_join(appeal_var, by = "case_id") %>%
+  left_join(appeal_var, by = "expediente_n") %>%
   filter(var_appeal == 1) %>%
-  select(case_id, var_reversal)
+  select(expediente_n, var_reversal)
 
 # Create first auto outcome
 date_first_auto_var <- documents_amag_clean %>%
-  group_by(case_id) %>%
+  group_by(expediente_n) %>%
   summarise(date_first_auto = min(date, na.rm = TRUE))
 
 # Create end date for resolutions
@@ -105,50 +105,48 @@ date_resolution_var <- documents_amag_clean %>%
     fundada == 1 |
     fundada_parte == 1 |
     infundada == 1) %>%
-  group_by(case_id) %>%
+  group_by(expediente_n) %>%
   top_n(-1, date) %>%
   rename(date_resolution = date) %>%
-  select(date_resolution, case_id) %>%
+  select(date_resolution, expediente_n) %>%
   distinct()
 
 # Create end date for sentences
 date_sentence_var <- documents_amag_clean %>%
   filter(fundada == 1 | fundada_parte == 1 | infundada == 1) %>%
-  group_by(case_id) %>%
+  group_by(expediente_n) %>%
   top_n(-1, date) %>%
   rename(date_sentence = date) %>%
-  select(date_sentence, case_id) %>%
+  select(date_sentence, expediente_n) %>%
   distinct()
 
 # Create end date for reversals
 date_reversal_var <- documents_amag_clean %>%
   filter(revoca == 1 | nula == 1 | confirma == 1) %>%
-  group_by(case_id) %>%
+  group_by(expediente_n) %>%
   top_n(-1, date) %>%
   rename(date_reversal = date) %>%
-  left_join(reversal_var, by = c("case_id")) %>%
+  left_join(reversal_var, by = c("expediente_n")) %>%
   filter(!is.na(var_reversal)) %>%
   distinct() %>%
   # Keep reversals with positive date since sentence
   left_join(date_sentence_var) %>%
   mutate(length_sentence_reversal = as.numeric(date_reversal - date_sentence)) %>%
   filter(length_sentence_reversal > 0) %>%
-  select(date_reversal, case_id)
+  select(date_reversal, expediente_n)
 
 # Join datasets -----
 
 case_outcomes <- fundada_var %>%
-  left_join(reversal_var, by = "case_id") %>%
-  left_join(appeal_var, by = "case_id") %>%
-  left_join(resolution_var, by = "case_id") %>%
-  left_join(date_first_auto_var, by = "case_id") %>%
-  left_join(date_sentence_var, by = "case_id") %>%
-  left_join(date_reversal_var, by = "case_id") %>%
-  left_join(date_resolution_var, by = "case_id") %>%
-  left_join(reportes_amag_clean, by = "case_id") %>%
-  left_join(procedural_parts_amag_clean, by = "case_id") %>%
-  rename(participant_id = participant_id.x) %>%
-  select(-participant_id.y)
+  left_join(reversal_var, by = "expediente_n") %>%
+  left_join(appeal_var, by = "expediente_n") %>%
+  left_join(resolution_var, by = "expediente_n") %>%
+  left_join(date_first_auto_var, by = "expediente_n") %>%
+  left_join(date_sentence_var, by = "expediente_n") %>%
+  left_join(date_reversal_var, by = "expediente_n") %>%
+  left_join(date_resolution_var, by = "expediente_n") %>%
+  left_join(reportes_amag_clean, by = "expediente_n") %>%
+  left_join(procedural_parts_amag_clean, by = "expediente_n")
 
 # Create additional outcome variables
 case_outcomes <- case_outcomes %>%
@@ -158,57 +156,57 @@ case_outcomes <- case_outcomes %>%
     month_year_first_auto = format(as.Date(date_first_auto), "%Y-%m"),
     month_year_sentence = format(as.Date(date_sentence), "%Y-%m"),
     month_year_resolution = format(as.Date(date_resolution), "%Y-%m"),
-    # Case start during/after PCA
-    first_auto_before_pca = if_else(
-      date_first_auto < "2020-04-01",
+    # Case start during/after treatment
+    first_auto_before_treatment = if_else(
+      date_first_auto < "2021-06-05",
       1, 0),
-    first_auto_during_pca = if_else(
-      date_first_auto >= "2020-04-01" & date_first_auto < "2021-01-01",
+    first_auto_during_treatment = if_else(
+      date_first_auto >= "2021-06-05" & date_first_auto < "2021-07-21",
       1, 0),
-    first_auto_duringafter_pca = if_else(
-      date_first_auto >= "2020-04-01",
+    first_auto_duringafter_treatment = if_else(
+      date_first_auto >= "2021-06-05",
       1, 0),
-    first_auto_after_pca = if_else(
-      date_first_auto >= "2021-01-01",
+    first_auto_after_treatment = if_else(
+      date_first_auto >= "2021-07-21",
       1, 0),
-    # Sentence during/after PCA
-    sentence_before_pca = if_else(
-      date_sentence < "2020-04-01",
+    # Sentence during/after treatment
+    sentence_before_treatment = if_else(
+      date_sentence < "2021-06-05",
       1, 0),
-    sentence_during_pca = if_else(
-      date_sentence >= "2020-04-01" & date_sentence < "2021-01-01",
+    sentence_during_treatment = if_else(
+      date_sentence >= "2021-06-05" & date_sentence < "2021-07-21",
       1, 0),
-    sentence_duringafter_pca = if_else(
-      date_sentence >= "2020-04-01",
+    sentence_duringafter_treatment = if_else(
+      date_sentence >= "2021-06-05",
       1, 0),
-    sentence_after_pca = if_else(
-      date_sentence >= "2021-01-01",
+    sentence_after_treatment = if_else(
+      date_sentence >= "2021-07-21",
       1, 0),
-    # Reversal during/after PCA
-    reversal_before_pca = if_else(
-      date_reversal < "2020-04-01",
+    # Reversal during/after treatment
+    reversal_before_treatment = if_else(
+      date_reversal < "2021-06-05",
       1, 0),
-    reversal_during_pca = if_else(
-      date_reversal >= "2020-04-01" & date_reversal < "2021-01-01",
+    reversal_during_treatment = if_else(
+      date_reversal >= "2021-06-05" & date_reversal < "2021-07-21",
       1, 0),
-    reversal_duringafter_pca = if_else(
-      date_reversal >= "2020-04-01",
+    reversal_duringafter_treatment = if_else(
+      date_reversal >= "2021-06-05",
       1, 0),
-    reversal_after_pca = if_else(
-      date_reversal >= "2021-01-01",
+    reversal_after_treatment = if_else(
+      date_reversal >= "2021-07-21",
       1, 0),
-    # Resolution during/after PCA
-    resolution_before_pca = if_else(
-      date_resolution < "2020-04-01",
+    # Resolution during/after treatment
+    resolution_before_treatment = if_else(
+      date_resolution < "2021-06-05",
       1, 0),
-    resolution_during_pca = if_else(
-      date_resolution >= "2020-04-01" & date_resolution < "2021-01-01",
+    resolution_during_treatment = if_else(
+      date_resolution >= "2021-06-05" & date_resolution < "2021-07-21",
       1, 0),
-    resolution_duringafter_pca = if_else(
-      date_resolution >= "2020-04-01",
+    resolution_duringafter_treatment = if_else(
+      date_resolution >= "2021-06-05",
       1, 0),
-    resolution_after_pca = if_else(
-      date_resolution >= "2021-01-01",
+    resolution_after_treatment = if_else(
+      date_resolution >= "2021-07-21",
       1, 0),
     # Length between first auto and resolution
     length_auto_resolution = as.numeric(date_resolution - date_first_auto),
@@ -272,5 +270,5 @@ case_outcomes <- case_outcomes %>%
 
 # Save datasets ----
 
-write_csv(case_outcomes, paste0(
-  local_storage, "case_outcomes.csv"))
+write_csv(case_outcomes, file.path(
+  local_storage, "intermediate", "case_outcomes_amag_ii.csv"))
