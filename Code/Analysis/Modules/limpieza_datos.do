@@ -50,3 +50,33 @@ subsections other controls are added
 	tab Position, gen(position_)
 	tab Course, gen(course_)
 	tab Gender, gen(gender_)
+	
+	
+	/*-----
+	Merging datasets
+	-----*/
+	
+	*merging with satisfaction clean data
+	merge m:1 DNI using sat_clean.dta
+	drop _m
+
+	*merging with grades clean data
+	merge m:1 DNI using grades_clean.dta
+	drop _m
+	
+	
+	/*-----
+	Creating variables using merged datasets vars
+	-----*/
+	
+	*renaming satisfaction variables
+	rename sat3 sat_instructor
+	rename sat5 sat_exp
+	rename sat2 sat_course
+	rename meansat sat_avg
+
+	*attrition
+	gen attrition=.
+	replace attrition = 0 if bs_Estado_de_Cuestionario=="Completo"
+	replace attrition = 1 if (regex(en_Estado_de_Cuestionario,"Comenzo") | regex(en_Estado_de_Cuestionario,"Falta")) & bs_Estado_de_Cuestionario=="Completo"
+	tab attrition
