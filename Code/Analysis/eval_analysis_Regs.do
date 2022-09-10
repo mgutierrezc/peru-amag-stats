@@ -19,6 +19,7 @@ Setting up directories
 *di `"Please, input the main path where the required data for running this dofile is stored into the COMMAND WINDOW and then press ENTER  "'  _request(path)
 global path "D:\Accesos directos\Trabajo\World Bank\Peru Amag\peru-amag-stats"
 global data "$path\Data"
+global judges_outcomes "$data\judges-outcomes\final"
 global output "$path\output"
 global modules "$path\Code\Analysis\Modules"
 
@@ -78,3 +79,9 @@ Book Choices
 
 	do "$modules\book_regs.do"
 	
+
+/*=====
+Merge with Judges Outcomes DBs
+=====*/
+
+*	do "$modules\book_regs.do"
