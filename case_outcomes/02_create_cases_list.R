@@ -7,7 +7,7 @@ amag_ii_participants <- read_csv(
 # Cases data
 ## Get the file names
 files <- list.files(
-  path = file.path(data_cej, "data_cleaned"),
+  path = file.path(data_cej),
   pattern = "*.csv",
   recursive = TRUE)
 
@@ -17,7 +17,7 @@ files_reportes <- files_reportes[!str_detect(files_reportes, "2017")]
 
 ## Load datasets
 reportes <- lapply(
-  file.path(data_cej, "data_cleaned", files_reportes), read_csv) %>%
+  file.path(data_cej, files_reportes), read_csv) %>%
   bind_rows() %>%
   clean_names()
 
