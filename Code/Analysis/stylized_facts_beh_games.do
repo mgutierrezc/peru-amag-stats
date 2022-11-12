@@ -48,33 +48,7 @@ Merging with Grades data
 	drop if DNI == .
 	merge 1:1 DNI using "$data\grades_clean"
 
-
-/*=====
-Regressions on Educational Attainment
-=====*/
-
-	global controls6 i.en_Course Age_rounded Age_squared i.en_Gender i.en_Position bs_iat_score
-	global outcomes_ed attendance grade pass
 	
-	local i = 1
-	foreach var_ed in $outcomes_ed {
-		sum `var_ed'
-		
-		reg `var_ed' socratic_treated, cluster(Course)
-		if(`i'==1){
-			outreg2 using "$tables\educ_at.xls", replace stats(coef pval ) level(95) label
-		}
-		else {
-			outreg2 using "$tables\educ_at.xls", append stats(coef pval ) level(95) label
-		}
-			
-		reg `var_ed' socratic_treated $controls6 , cluster(Course)
-		outreg2 using "$tables\educ_at.xls", append stats(coef pval ) level(95) label		
-			
-		local i = `i' + 1
-	}
-		
-
 /*=====
 Stylized facts 
 =====*/
