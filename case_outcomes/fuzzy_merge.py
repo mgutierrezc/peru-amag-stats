@@ -89,7 +89,7 @@ if __name__ == "__main__":
 
     # loading lab data
     # lab_data_path = input("Please, input the path to your data file as dta (e.g. path/lab_data.dta)") # data_path + "/lab_Data/Clean_Full_Data12.dta"
-    lab_data_path = data_path + "/lab_Data/Clean_Full_Data12.dta"
+    lab_data_path = data_path + "/lab_data/Clean_Full_Data12.dta"
     lab_data = pd.read_stata(lab_data_path)
     
     # creating the combinations 
