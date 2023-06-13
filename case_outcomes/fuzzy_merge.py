@@ -104,7 +104,7 @@ if __name__ == "__main__":
     exp_participants.to_csv(dc_raw_path + "/exp_participants_list.csv")
 
     # obtaining names from cases
-    files_reports = pd.read_csv(dc_raw_path + "2022/DF_file_report_2022.csv")
+    files_reports = pd.read_csv(dc_raw_path + "/2022/DF_file_report_2022.csv")
     files_reports = clean_names(files_reports)
 
     # cleaning names from cases data
