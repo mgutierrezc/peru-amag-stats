@@ -20,6 +20,7 @@ def extract_text(text: str, pattern: str) -> str:
     else:
         return ""
 
+
 def read_json_dict(path: str) -> dict:
     """
     Reads a json file and returns it as dict object
@@ -27,6 +28,7 @@ def read_json_dict(path: str) -> dict:
     
     file = open(path) # Opening JSON file
     return json.load(file) # returns JSON object as a dictionary
+
 
 def folder_creator(folder_name: string, path: string) -> None:
     """
@@ -60,7 +62,8 @@ def create_pickle(object_name, file_name: str, path: str) -> None:
     with open(path + f"/{file_name}", "wb") as storing_output:
         pickle.dump(object_name, storing_output)
         storing_output.close()
-        
+
+
 def read_pickle(file_name: str, path: str) -> None:
     """
     Reads pickle file from specified path 
@@ -69,6 +72,7 @@ def read_pickle(file_name: str, path: str) -> None:
     output = pickle.load(pickle_file)
     pickle_file.close()
     return output
+
 
 if __name__ == "__main__":
     # reading folders
@@ -89,7 +93,7 @@ if __name__ == "__main__":
 
     # loading lab data
     # lab_data_path = input("Please, input the path to your data file as dta (e.g. path/lab_data.dta)") # data_path + "/lab_Data/Clean_Full_Data12.dta"
-    lab_data_path = data_path + "/lab_data/Clean_Full_Data12.dta"
+    lab_data_path = data_path + "/lab_data/Clean_Full_Data12_filtered.dta"
     lab_data = pd.read_stata(lab_data_path)
     
     # creating the combinations 
@@ -172,10 +176,12 @@ if __name__ == "__main__":
     # dropping duplicates in judges from lab data based on nombre_apellido
     nombre_apellido_merge = pd.merge(judge_names_only, exp_participants, left_on="juez", right_on="participant_nombre_apellido")
     nombre_apellido_merge = nombre_apellido_merge.drop_duplicates(subset=["juez"])
+    nombre_apellido_merge.to_excel(dc_interm_path + "/nombre_apellido_merge.xlsx")
 
     # dropping duplicates in judges from lab data based on apellido_nombre
     apellido_nombre_merge = pd.merge(judge_names_only, exp_participants, left_on="juez", right_on="participant_apellido_nombre")
     apellido_nombre_merge = apellido_nombre_merge.drop_duplicates(subset=["juez"])
+    apellido_nombre_merge.to_excel(dc_interm_path + "/apellido_nombre_merge.xlsx")
 
     # keeping the judges names from cases that couldn't be merged directly by nombre_apellido and apellido_nombre
     judge_names_only_cleaned = judge_names_only[~judge_names_only["juez"].isin(nombre_apellido_merge["juez"])]
