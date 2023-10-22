@@ -150,3 +150,6 @@ output/
 *.xls#
 *.xlsx
 *.xlsx#
+
+# paths file
+*.json

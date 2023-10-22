@@ -1,6 +1,6 @@
 cls
 /*=============================
-Regressions for Peru Amag II
+Validation of Peru Amag II
 
 ---
 author: Ronak Jain, Mayumi Cornejo, 
@@ -22,6 +22,8 @@ global data "$path\Data"
 global judges_outcomes "$data\judges-outcomes\final"
 global output "$path\output"
 global modules "$path\Code\Analysis\Modules"
+global hr_judges "D:\Dropbox (Daniel Chen)\Peru_Justice\02_Data\04_Poder_Judicial\02_Raw"
+global judges_outcomes "D:\Accesos directos\Trabajo\World Bank\Peru Amag\peru-amag-stats\Data\judges-outcomes\raw"
 
 global docs "$output\eval_regs"
 cap mkdir "$docs"
@@ -44,44 +46,17 @@ Cleaning and variable generation
 	
 
 /*=====
-Selection on observables
+Merging with list of judges
 =====*/
-	orth_out position_* course_* gender_1 Age_rounded using "$tables\selection.xlsx", by(en_Estado_de_Cuestionario) pcompare stars se sheet(selection_en) sheetreplace
-	orth_out position_* course_* gender_1 Age_rounded using "$tables\selection.xlsx", by(bs_Estado_de_Cuestionario) pcompare stars se sheet(selection_bs) sheetreplace
-
-
-/*=====
-Changes in Behavior: Motivated reasoning, 
-Curiosity and Confirmation Bias
-=====*/	
-
-	do "$modules\motiv_curios_conf_bias.do"
-
 	
-/*=====
-Changes in Behavior: Gender Biases
-IAT
-=====*/
+	**Current judges
+	preserve
+		import delimited "$hr_judges\HR_present.csv", clear
+		rename dni DNI
+		save "$judges_outcomes\hr_present", replace
+	restore
 
-	do "$modules\iat_treatment_effs.do"
+	**Merging with current judges
+	drop if DNI == .
+	merge 1:1 DNI using "$judges_outcomes\hr_present"
 	
-	
-/*=====
-Trolley 
-=====*/
-
-	do "$modules\trolley_regs.do"
-
-
-/*=====
-Book Choices 
-=====*/
-
-	do "$modules\book_regs.do"
-	
-
-/*=====
-Merge with Judges Outcomes DBs
-=====*/
-
-*	do "$modules\book_regs.do"

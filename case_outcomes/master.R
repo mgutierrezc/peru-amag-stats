@@ -10,14 +10,14 @@ construct_outcomes <- 1
 
 # User path -----------------------------------------------------------------
 
-data_path <- "/Users/brandonmora/Dropbox/Peru_Justice/02_Data"
+data_path <- "D:/Accesos directos/Trabajo/World Bank/WB Repos/peru-scrape-master"
 code_path <- "/Users/brandonmora/GitHub/peru-amag-stats/case_outcomes"
 
 # Folder globals ------------------------------------------------------------
 data_amag_i <- file.path(data_path, "01_AMAG")
-data_cej <- file.path(data_path, "08_CEJ_Web")
+data_cej <- file.path(data_path, "data_cleaned")
 data_gender <- file.path(data_path, "07_Other/02_Raw/names_gender")
-local_storage <- "/Users/brandonmora/Dropbox/World Bank/AMAG I/15_amag2/datasets"
+local_storage <- "D:/Dropbox (Daniel Chen)/datasets_amag_ii_scrape"
 
 # Packages used --------------------------------------------------------------
 packages <- c(
@@ -34,7 +34,11 @@ packages <- c(
   "ggpubr",
   "fixest",
   "modelsummary",
-  "kableExtra")
+  "kableExtra",
+  "readr",
+  "stringr",
+  "janitor",
+  "tidyr")
 
 # Install packages
 sapply(packages, function(x) {

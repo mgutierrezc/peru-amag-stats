@@ -263,7 +263,7 @@ procedural_parts_amag <- read_csv(
     # Create legal entity identifier
     legal_entity = if_else(tipo_de_persona == "JURIDICA", 1, 0)) %>%
   # Filter defendant/plaintiff rows
-  filter(parties == "plaintiff" | parties == "defendant") %>%
+  filter(parties == "plainltiff" | parties == "defendant") %>%
   separate(
   nombres, c("first_name", "second_name"),
   extra = "drop", fill = "right")
