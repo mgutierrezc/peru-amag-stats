@@ -1,7 +1,18 @@
 # peru-amag-stats
-Codes for basic stats from Peru Amag Project
+Codes for statistical analysis of Peru Amag Project. Check `Codes` folder to find the scripts for each task
 
+## Analysis
+Scripts for AMAG II RCT regressions. The main .do files can be found on [eval_analysis_Regs.do](`https://github.com/mgutierrezc/peru-amag-stats/blob/main/Code/Analysis/eval_analysis_Regs.do`) and [eval_analysis_Figs.do](`https://github.com/mgutierrezc/peru-amag-stats/blob/main/Code/Analysis/eval_analysis_Figs.do`). They generate the tables and figures used on the Overleaf draft for the [paper](https://www.overleaf.com/project/63681e75c819cefea3df3755).
 
+## Case Outcomes
+Creates judicial outcomes from Peruvian judicial data scraped from publicly available websites. There are two versions of the code:
+
+- R pipeline (R scripts within the folder)
+- Jupyter notebook (Case Outcomes for Amag II.ipynb)
+
+The R pipeline works simultaneously with all the scraped files from 2017 to 2021. The Jupyter creates the same outcomes but for one year at a time and works with data from 2017 and forwards.
+
+It's recommended to use the Jupyter rather than the R scripts as the size of the data and some of its snippets are not fully optimized, such as the fuzzy merge one.
 
 ## IAT Reconstructor
 
